@@ -1,0 +1,54 @@
+<td>
+<ul>	
+[+hasend:is=`1`:then=`
+		<li class="belegt_abr blox" xedit_tabs="@CONFIG" chunkname="reservation"
+			title="[+room_title+]:[+blox.config.canedit:is=`1`:then=`[+end.pagetitle+]`+] [+end.Time:date_ger=`%d.%m.%Y`+]-[+end.Timeend:date_ger=`%d.%m.%Y`+]" style="background-color:#a95c73;">
+			[+blox.config.canedit:is=`1`:then=`	
+				<a class="btnedit save" title="[+room_title+]: [+end.pagetitle+] [+end.Time:date_ger=`%d.%m.%Y`+]-[+end.Timeend:date_ger=`%d.%m.%Y`+]" href="[~[+blox.config.custom.docids.edittime+]~]?eventID=[+end.id+]&callmonth=[+tsday:date_mod=`month`+]&callyear=[+tsday:date_mod=`year`+]&room_ID=[+room_ID+]&room_title=[+room_title+]&callID=[*id*]">o</a>
+			`+]	  
+		</li>
+[+hasstart:isnot=`1`:then=`
+		<li class="frei_anr blox" xedit_tabs="@CONFIG" chunkname="reservation"
+				title="[+room_title+]: frei" >
+				[+blox.config.canedit:is=`1`:then=`	
+					<a class="newicon save" title="[+room_title+] ab [+tsday:date_ger=`%d.%m.%Y`+]  belegen" href="[~[+blox.config.custom.docids.maketime+]~]?newday=[+tsday:date_ger=`%d`+]&newmonth=[+tsday:date_mod=`month`+]&newyear=[+tsday:date_mod=`year`+]&callID=[*id*]&callmonth=[+tsday:date_mod=`month`+]&callyear=[+tsday:date_mod=`year`+]&room_ID=[+room_ID+]&room_title=[+room_title+]">+</a>
+				`+]	 
+		</li>
+`+]		
+`+]
+
+[+hasstart:is=`1`:then=`
+[+hasend:isnot=`1`:then=`
+		<li class="frei_abr blox" xedit_tabs="@CONFIG" chunkname="reservation"
+				title="[+room_title+]:Abreise frei" >
+		</li>
+`+]		
+		<li class="belegt_anr blox" xedit_tabs="@CONFIG" chunkname="reservation"
+			title="[+room_title+]:[+blox.config.canedit:is=`1`:then=`[+start.pagetitle+]`+] [+start.Time:date_ger=`%d.%m.%Y`+]-[+start.Timeend:date_ger=`%d.%m.%Y`+]" >
+			[+blox.config.canedit:is=`1`:then=`	
+				<a class="btnedit save" title="[+room_title+]: [+start.pagetitle+] [+start.Time:date_ger=`%d.%m.%Y`+]-[+start.Timeend:date_ger=`%d.%m.%Y`+]" href="[~[+blox.config.custom.docids.edittime+]~]?eventID=[+start.id+]&callmonth=[+tsday:date_mod=`month`+]&callyear=[+tsday:date_mod=`year`+]&room_ID=[+room_ID+]&room_title=[+room_title+]&callID=[*id*]">o</a>
+			`+]	  
+		</li>
+`+]
+
+[+hasmid:is=`1`:then=`
+		<li class="belegt blox" xedit_tabs="@CONFIG" chunkname="reservation"
+			title="[+room_title+]:[+blox.config.canedit:is=`1`:then=`[+pagetitle+]`+] [+Time:date_ger=`%d.%m.%Y`+]-[+Timeend:date_ger=`%d.%m.%Y`+]" >
+			[+xett.config.canedit:is=`1`:then=`	
+				<a class="btnedit save" title="[+room_title+]: [+pagetitle+] [+Time:date_ger=`%d.%m.%Y`+]-[+Timeend:date_ger=`%d.%m.%Y`+]" href="[~[+blox.config.custom.docids.edittime+]~]?eventID=[+id+]&callmonth=[+tsday:date_mod=`month`+]&callyear=[+tsday:date_mod=`year`+]&room_ID=[+room_ID+]&room_title=[+room_title+]&callID=[*id*]">o</a>
+			`+]	  
+		</li>
+`+]
+
+[+groupeventscount:is=`0`:then=`
+    <li class="frei blox " xedit_tabs="@CONFIG" chunkname="reservation" 
+	title="[+room_title+]: frei" >
+	[+blox.config.canedit:is=`1`:then=`	
+    	<a class="btnnew save" title="[+room_title+] ab [+tsday:date_ger=`%d.%m.%Y`+]  belegen" href="[~[+blox.config.custom.docids.maketime+]~]?newday=[+tsday:date_ger=`%d`+]&newmonth=[+tsday:date_mod=`month`+]&newyear=[+tsday:date_mod=`year`+]&callID=[*id*]&callmonth=[+tsday:date_mod=`month`+]&callyear=[+tsday:date_mod=`year`+]&room_ID=[+room_ID+]&room_title=[+room_title+]">+</a>
+	`+]	
+
+	</li> 
+`+]
+
+</ul>		
+</td>

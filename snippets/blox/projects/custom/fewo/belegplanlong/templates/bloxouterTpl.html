@@ -1,0 +1,34 @@
+<div id="top">
+    <div class="messages">[+messages+]</div>
+
+	<div class="kalender">
+		<table class="month">
+			<tbody>
+				<tr class="xttnavi">
+					<th class="btYear left" valign="bottom"><a class="arrow2" href=[~[*id*]~]&month=[+tsmonth:date_mod=`month`+]&year=[+tsmonth:date_mod=`year:-1_year`+] title="[+tsmonth:date_mod=`year:-1_year`+]">[+tsmonth:date_mod=`year:-1_year`+]</a></th>
+					<th class="btMonth left" valign="bottom"><a class="arrow1" href=[~[*id*]~]&month=[+tsmonth:date_mod=`month:-1_month`+]&year=[+tsmonth:date_mod=`year:-1_month`+] title="[+tsmonth:date_mod=`monthname:-1_month:[+blox.config.custom.monthnames+]`+][+tsmonth:date_mod=`year:-1_month`+]">[+tsmonth:date_mod=`monthname:-1_month:[+blox.config.custom.monthnames+]`+]</a></th>
+					<th class="currentMonth" valign="bottom">[+tsmonth:date_mod=`monthname::[+blox.config.custom.monthnames+]`+] [+tsmonth:date_mod=`year`+]</th>
+					<th class="btMonth right" valign="bottom"><a class="arrow1" href=[~[*id*]~]&month=[+tsmonth:date_mod=`month:+1_month`+]&year=[+tsmonth:date_mod=`year:+1_month`+] title="[+tsmonth:date_mod=`monthname:+1_month:[+blox.config.custom.monthnames+]`+][+tsmonth:date_mod=`year:+1_month`+]">[+tsmonth:date_mod=`monthname:+1_month:[+blox.config.custom.monthnames+]`+]</a></th>
+					<th class="btYear right" valign="bottom"><a class="arrow2" href=[~[*id*]~]&month=[+tsmonth:date_mod=`month`+]&year=[+tsmonth:date_mod=`year:+1_year`+] title="[+tsmonth:date_mod=`year:+1_year`+]">[+tsmonth:date_mod=`year:+1_year`+]</a></th>
+				</tr>
+			</tbody>
+		</table>
+	
+		<table class="monthlist">
+			<thead>
+				<tr>
+					[+innerrows.monthlist+]
+				</tr>
+			</thead>
+		</table>
+		
+		
+		[+innerrows.month+]
+
+
+	</div>
+</div>
+
+{{Dateilisten}}
+
+<div class="clear"></div>

@@ -1,0 +1,48 @@
+[+xett.row.hasend:is=`1`:then=`
+		<li class="belegt_abr" 
+			title="[+xett.row.room_title+]:[+xett.config.canedit:is=`1`:then=`[+xett.row.end.pagetitle+]`+] [+xett.row.end.Time:date_ger=`%d.%m.%Y`+]-[+xett.row.end.Timeend:date_ger=`%d.%m.%Y`+]" style="background-color:#a95c73;">
+			[+xett.config.canedit:is=`1`:then=`	
+				<a class="btnedit" title="[+xett.row.room_title+]: [+xett.row.end.pagetitle+] [+xett.row.end.Time:date_ger=`%d.%m.%Y`+]-[+xett.row.end.Timeend:date_ger=`%d.%m.%Y`+]" href="[~[+xett.config.docids.edittime+]~]&eventID=[+xett.row.end.id+]&callmonth=[+xett.row.end.tsday:date_mod=`month`+]&callyear=[+xett.row.end.tsday:date_mod=`year`+]&room_ID=[+xett.row.end.room_ID+]&room_title=[+xett.row.end.room_title+]&callID=[*id*]">o</a>
+			`+]	  
+		</li>
+[+xett.row.hasstart:isnot=`1`:then=`
+		<li class="frei_anr" 
+				title="[+xett.row.room_title+]: frei" >
+				[+xett.config.canedit:is=`1`:then=`	
+					<a class="newicon" title="[+xett.row.room_title+] ab [+xett.row.tsday:date_ger=`%d.%m.%Y`+]  belegen" href="[~[+xett.config.docids.maketime+]~]&newday=[+xett.row.tsday:date_ger=`%d`+]&newmonth=[+xett.row.tsday:date_mod=`month`+]&newyear=[+xett.row.tsday:date_mod=`year`+]&callID=[*id*]&callmonth=[+xett.row.tsday:date_mod=`month`+]&callyear=[+xett.row.tsday:date_mod=`year`+]&room_ID=[+xett.row.room_ID+]&room_title=[+xett.row.room_title+]">+</a>
+				`+]	 
+		</li>
+`+]		
+`+]
+
+[+xett.row.hasstart:is=`1`:then=`
+[+xett.row.hasend:isnot=`1`:then=`
+		<li class="frei_abr" 
+				title="[+xett.row.room_title+]:Abreise frei" >
+		</li>
+`+]		
+		<li class="belegt_anr" 
+			title="[+xett.row.room_title+]:[+xett.config.canedit:is=`1`:then=`[+xett.row.start.pagetitle+]`+] [+xett.row.start.Time:date_ger=`%d.%m.%Y`+]-[+xett.row.start.Timeend:date_ger=`%d.%m.%Y`+]" >
+			[+xett.config.canedit:is=`1`:then=`	
+				<a class="btnedit" title="[+xett.row.room_title+]: [+xett.row.start.pagetitle+] [+xett.row.start.Time:date_ger=`%d.%m.%Y`+]-[+xett.row.start.Timeend:date_ger=`%d.%m.%Y`+]" href="[~[+xett.config.docids.edittime+]~]&eventID=[+xett.row.start.id+]&callmonth=[+xett.row.start.tsday:date_mod=`month`+]&callyear=[+xett.row.start.tsday:date_mod=`year`+]&room_ID=[+xett.row.start.room_ID+]&room_title=[+xett.row.start.room_title+]&callID=[*id*]">o</a>
+			`+]	  
+		</li>
+`+]
+
+[+xett.row.hasmid:is=`1`:then=`
+		<li class="belegt" 
+			title="[+xett.row.room_title+]:[+xett.config.canedit:is=`1`:then=`[+xett.row.pagetitle+]`+] [+xett.row.Time:date_ger=`%d.%m.%Y`+]-[+xett.row.Timeend:date_ger=`%d.%m.%Y`+]" >
+			[+xett.config.canedit:is=`1`:then=`	
+				<a class="btnedit" title="[+xett.row.room_title+]: [+xett.row.pagetitle+] [+xett.row.Time:date_ger=`%d.%m.%Y`+]-[+xett.row.Timeend:date_ger=`%d.%m.%Y`+]" href="[~[+xett.config.docids.edittime+]~]&eventID=[+xett.row.id+]&callmonth=[+xett.row.tsday:date_mod=`month`+]&callyear=[+xett.row.tsday:date_mod=`year`+]&room_ID=[+xett.row.room_ID+]&room_title=[+xett.row.room_title+]&callID=[*id*]">o</a>
+			`+]	  
+		</li>
+`+]
+
+[+xett.row.groupeventscount:is=`0`:then=`
+    <li class="frei" 
+	title="[+xett.row.room_title+]: frei" >
+	[+xett.config.canedit:is=`1`:then=`	
+    	<a class="btnnew" title="[+xett.row.room_title+] ab [+xett.row.tsday:date_ger=`%d.%m.%Y`+]  belegen" href="[~[+xett.config.docids.maketime+]~]&newday=[+xett.row.tsday:date_ger=`%d`+]&newmonth=[+xett.row.tsday:date_mod=`month`+]&newyear=[+xett.row.tsday:date_mod=`year`+]&callID=[*id*]&callmonth=[+xett.row.tsday:date_mod=`month`+]&callyear=[+xett.row.tsday:date_mod=`year`+]&room_ID=[+xett.row.room_ID+]&room_title=[+xett.row.room_title+]">+</a>
+	`+]	
+	</li> 
+`+]

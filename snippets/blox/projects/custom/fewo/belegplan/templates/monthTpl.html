@@ -1,0 +1,35 @@
+<table class="month"><tbody>
+<tr>
+[+xett.innerrows.weekdays+]
+</tr>
+[+xett.innerrows.week+]
+</tbody></table>
+<table class="month"><tbody>
+<tr class="xttnavi">
+<th>
+<a class="left" href=[~[*id*]~]&month=[+xett.row.tsmonth:date_mod=`month`+]&year=[+xett.row.tsmonth:date_mod=`year:-1_year`+]
+title="[+xett.row.tsmonth:date_mod=`year:-1_year`+]">
+<--</a> 
+</th>
+<th>
+<a class="left" href=[~[*id*]~]&month=[+xett.row.tsmonth:date_mod=`month:-1_month`+]&year=[+xett.row.tsmonth:date_mod=`year:-1_month`+]
+title="[+xett.row.tsmonth:date_mod=`monthname:-1_month:[+xett.config.str_monthnames+]`+]
+[+xett.row.tsmonth:date_mod=`year:-1_month`+]">
+<-</a> 
+</th>
+<th colspan="4" style="vertical-align:middle">
+[+xett.row.tsmonth:date_mod=`monthname::[+xett.config.str_monthnames+]`+] [+xett.row.tsmonth:date_mod=`year`+]
+</th>
+<th>
+<a class="right" href=[~[*id*]~]&month=[+xett.row.tsmonth:date_mod=`month:+1_month`+]&year=[+xett.row.tsmonth:date_mod=`year:+1_month`+]
+title="[+xett.row.tsmonth:date_mod=`monthname:+1_month:[+xett.config.str_monthnames+]`+]
+[+xett.row.tsmonth:date_mod=`year:+1_month`+]">
+-></a> 
+</th>
+<th>
+<a class="right" href=[~[*id*]~]&month=[+xett.row.tsmonth:date_mod=`month`+]&year=[+xett.row.tsmonth:date_mod=`year:+1_year`+]
+title="[+xett.row.tsmonth:date_mod=`year:+1_year`+]">
+--></a> 
+</th>
+</tr>
+</tbody></table>

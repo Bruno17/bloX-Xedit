@@ -1,0 +1,208 @@
+#xetcontent {
+font-family:Verdana,Arial,Helvetica,sans-serif;
+font-weight:normal;
+}
+#xettcontent a, #xettcontent a:visited {
+color:#773428 !important;
+}
+#xettcontent table a:hover {
+text-decoration:underline;
+}
+.printString {
+display:none;
+}
+table.tableFreieTermine {
+border-collapse:collapse;
+font-size:10px;
+}
+table.tableFreieTermine a {
+text-decoration:none;
+}
+table.tableFreieTermine a:hover {
+text-decoration:underline;
+}
+table.tableFreieTermine ul {
+list-style-position:inside;
+list-style-type:none;
+margin:0;
+overflow:hidden;
+padding:0;
+width:18px;
+}
+table.tableFreieTermine li {
+float:left;
+height:20px;
+margin:0;
+}
+#top .blox{
+border:none;
+margin:0;
+padding:0;
+}
+#top table.tableFreieTermine li.frei{
+background-color:#C6D2C2;
+width:18px;
+}
+#top table.tableFreieTermine li.frei_anr {
+background-color:#C6D2C2;
+border-left:1px solid #C6D2C2;
+width:8px;
+}
+#top table.tableFreieTermine li.frei_abr {
+background-color:#C6D2C2;
+border-right:1px solid #C6D2C2;
+width:8px;
+}
+#top table.tableFreieTermine li.belegt {
+background-color:#A95C73;
+width:18px;
+}
+#top table.tableFreieTermine li.belegt_anr {
+background-color:#A95C73;
+border-left:1px solid #C6D2C2;
+width:8px;
+}
+#top table.tableFreieTermine li.belegt_abr {
+background-color:#A95C73;
+border-right:1px solid #C6D2C2;
+width:8px;
+}
+table.tableFreieTermine thead th {
+color:#666666;
+font-size:10px;
+font-weight:normal;
+line-height:12px;
+padding:2px 0;
+text-align:center;
+}
+table.tableFreieTermine thead {
+border-bottom:1px solid #999999;
+}
+table.tableFreieTermine thead th {
+border-right:1px solid #EEEEEE;
+}
+table.tableFreieTermine tbody td {
+border-bottom:1px solid #EEEEEE;
+border-right:1px solid #EEEEEE;
+width:18px;
+}
+table.tableFreieTermine tbody td.tdRooms {
+padding-right:4px;
+width:auto;
+}
+table.tableFreieTermine td {
+padding:0;
+}
+table.tableFreieTermine p {
+display:block;
+height:20px;
+margin:0;
+padding:0;
+text-align:center;
+width:auto;
+}
+table.monthlist {
+border-bottom:1px solid #333333;
+border-collapse:collapse;
+border-top:1px solid #333333;
+font-size:11px;
+width:710px;
+}
+table.monthlist {
+}
+table.monthlist th {
+font-weight:normal;
+padding:4px 2px;
+}
+table.monthlist th.active {
+background-color:#DDDDDD;
+}
+table.monthlist a {
+display:block;
+text-decoration:none;
+}
+table.monthlist a, table.monthlist a:visited {
+background-image:url(/assets/images/sys/linkPfeil.gif);
+background-position:left center;
+background-repeat:no-repeat;
+color:#2B4558;
+}
+table.monthlist a:hover {
+text-decoration:underline;
+}
+table.month {
+border-collapse:collapse;
+margin-top:20px;
+text-align:center;
+width:710px;
+}
+table.month {
+border-bottom:1px solid #333333;
+clear:both;
+}
+table.month .currentMonth {
+font-family:Georgia,"Times New Roman",Times,serif;
+font-size:24px;
+font-weight:normal;
+line-height:24px;
+width:50%;
+text-align:center;
+}
+table.month th {
+font-size:12px;
+height:40px;
+line-height:12px;
+padding:0 0 5px;
+vertical-align:bottom;
+}
+table.month th.btYear, table.month th.btMonth, table.month th.btMonth, table.month th.btYear {
+width:12.5%;
+}
+table.month th.left {
+text-align:left;
+}
+table.month th.right {
+text-align:right;
+}
+table.month th a {
+background-repeat:no-repeat;
+display:block;
+font-weight:normal;
+height:13px;
+text-decoration:none;
+}
+table.month th a:hover {
+text-decoration:underline;
+}
+table.month th.left a {
+background-position:left center;
+}
+table.month th.right a {
+background-position:right center;
+}
+table.month th.left a.arrow1 {
+background-image:url(/assets/images/sys/xettArrowLeftSingle.gif);
+padding-left:7px;
+}
+table.month th.right a.arrow1 {
+background-image:url(/assets/images/sys/xettArrowRightSingle.gif);
+padding-right:7px;
+}
+table.month th.left a.arrow2 {
+background-image:url(/assets/images/sys/xettArrowLeftDouble.gif);
+padding-left:11px;
+}
+table.month th.right a.arrow2 {
+background-image:url(/assets/images/sys/xettArrowRightDouble.gif);
+padding-right:11px;
+}
+#WebLoginLayer0, webloginlayer2 {
+font-size:12px;
+}
+#tableLogin {
+margin:20px 0 0;
+}
+#tableLogin td {
+border-bottom:1px solid #DDDDDD;
+padding:10px 0;
+}

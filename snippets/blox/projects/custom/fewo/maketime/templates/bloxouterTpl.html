@@ -1,0 +1,70 @@
+<div class="kalender">
+<form action="[~[+POST.callID+]~]&day=[+POST.callday+]&month=[+POST.callmonth+]&year=[+POST.callyear+]" method="post" name="FormName">	
+
+<input type="hidden" name="createdby" value="[+blox.config.userID+]" />
+<input type="hidden" name="room_ID" value="[+POST.room_ID+]" />
+<input type="hidden" name="starttime" value="00:00" />
+<input type="hidden" name="endtime" value="00:00" />
+<input type="hidden" name="onbeforesave" value="reservation"/>
+<input type="hidden" name="saveblox" value="yes"/>
+[+id:isnot=``:then=`
+<input type="hidden" name="event_ID" value="[+id+]" />
+<input type="hidden" name="action" value="update" />
+<input type="hidden" name="oldTime" value="[+Time+]" />
+<input type="hidden" name="oldTimeend" value="[+Timeend+]" />
+`+]
+<table><tbody>
+<tr>
+<th colspan="3">
+<h3>Zimmerreservierung [+POST.room_title+]</h3>	
+</th>
+</tr>
+<td>	
+Mieter
+</td>
+<td colspan="2">	
+<input type="text" name="pagetitle" style="width:300px" value="[+pagetitle+]" />
+</td>
+</tr>
+<tr>
+<td>	
+Mietbeginn
+</td>
+<td colspan="2">
+<input id="dp-startdate" 
+class="fdp bloxinput" rangelow = "[+range_low+]" rangehigh="[+range_high+]" 
+type="text" maxlength="10" value="[+Time:date_ger=`%d.%m.%Y`+]" name="startdate"/>		
+</td>
+</tr>
+<tr>
+<td>	
+Mietende
+</td>
+<td colspan="2">
+<input id="dp-enddate" 
+class="fdp bloxinput" rangelow = "[+range_low+]" rangehigh="[+range_high+]" 
+type="text" maxlength="10" value="[+Timeend:date_ger=`%d.%m.%Y`+]" name="enddate"/>		
+</td>
+</tr>
+<tr>
+<td>	
+Ver&ouml;ffentlicht
+</td>
+<td>
+<input type="checkbox" name="published" value="1" [+published:is=`1`:then=`checked="checked"`+]/>
+</td>
+<td>	
+</td>
+</tr>
+<tr>
+<td>	
+Bemerkungen
+</td>
+<td colspan="2">	
+<textarea style="width: 300px;" rows="5" type="text" name="description">[+description+]</textarea>
+</td>
+</tr>
+</tbody></table>
+</form>	
+</div>
+

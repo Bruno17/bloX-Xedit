@@ -1,0 +1,37 @@
+<li class="[+xett.row.status+]" 
+[+xett.row.status:is=`frei`:then=`
+style="
+background-color:#33D000;
+border:none;
+text-align:center;"
+>
+[+xett.config.canedit:is=`1`:then=`	
+<a class="newicon" title="[+xett.row.room_title+] ab [+xett.row.tsday:date_ger=`%d.%m.%Y`+]  belegen" href="[~[+xett.config.docids.maketime+]~]&newday=[+xett.row.tsday:date_ger=`%d`+]&newmonth=[+xett.row.tsday:date_mod=`month`+]&newyear=[+xett.row.tsday:date_mod=`year`+]&callID=[*id*]&callmonth=[+xett.row.tsday:date_mod=`month`+]&callyear=[+xett.row.tsday:date_mod=`year`+]&room_ID=[+xett.row.room_ID+]&room_title=[+xett.row.room_title+]"
+style="display:block;height:100%;
+">
+[+xett.row.tsday:date_ger=`%d`+]
+</a>`+]	 
+`+]
+[+xett.row.status:is=`belegt`:then=`
+title="[+xett.row.pagetitle+] [+xett.row.Time:date_ger=`%d.%m.%Y`+]-[+xett.row.Timeend:date_ger=`%d.%m.%Y`+]"
+style="background-color:red;
+border:none;
+text-align:center;"
+>
+[+xett.config.canedit:is=`1`:then=`	
+<a class="newicon" title="[+xett.row.room_title+]: [+xett.row.pagetitle+] [+xett.row.Time:date_ger=`%d.%m.%Y`+]-[+xett.row.Timeend:date_ger=`%d.%m.%Y`+]" 
+href="[~[+xett.config.docids.edittime+]~]&eventID=[+xett.row.id+]&callmonth=[+xett.row.tsday:date_mod=`month`+]&callyear=[+xett.row.tsday:date_mod=`year`+]&room_ID=[+xett.row.room_ID+]&room_title=[+xett.row.room_title+]&callID=[*id*]"
+style="display:block;height:100%;
+">
+[+xett.row.tsday:date_ger=`%d`+]
+</a>`+]	  
+`+]
+[+xett.config.canedit:isnot=`1`:then=`	
+[+xett.row.tsday:date_ger=`%d`+]
+`+]	 
+</li>
+[+xett.row.room_title:is=``:then=``+]
+
+       
+
+

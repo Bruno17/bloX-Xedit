@@ -1,0 +1,29 @@
+[+xett.row.montheventsid:is=`1`:then=`
+
+<tr>	
+<th colspan="5"><h4>[+xett.row.Time:date_mod=`monthname`+] [+xett.row.Time:date_mod=`year`+]</h4></th>
+<th><input type="submit" name="anwenden" value="Anwenden" border="0"/>	</th>
+</tr>
+<tr>
+<td></td>
+<td>Zeitraum</td>	
+<td>Mieter</td> 
+<td>Bemerkung</td> 
+<td>ver&ouml;ffentlicht</td> 
+<td>l&ouml;schen</td> 
+</tr>     
+`+]
+<tr>
+<td>[+xett.row.montheventsid+]</td>  
+<td>[+xett.row.Time:date_ger=`%d.%m.%Y`+]-[+xett.row.Timeend:date_ger=`%d.%m.%Y`+]</td>	
+<td>[+xett.row.pagetitle+]</td> 
+<td>[+xett.row.description+]</td> 
+<td>
+<input type="hidden" value="0" name="published[+xett.row.id:bracket+]"/>
+<input type="checkbox" value="1" name="published[+xett.row.id:bracket+]"[+xett.row.published:is=`1`:then=`checked="checked"`+]/>
+</td> 
+<td><input type="checkbox" value="1" name="delete[+xett.row.id:bracket+]"/></td> 
+
+</tr>       
+
+
