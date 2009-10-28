@@ -2,7 +2,8 @@
 //$_SESSION['xedit_runs']='0';
 global $modx;
 $GLOBALS['xedit_runs']='0';
-$GLOBALS['ajax_url']=$this->makeAjaxUrl();
+$GLOBALS['ajax_urls']=$this->makeAjaxUrl();
+$GLOBALS['ajax_url']=$GLOBALS['ajax_urls']['ajax_url'];
 
 /*
 if ($this->userPermissions['cancreatedocs'] == '1') {

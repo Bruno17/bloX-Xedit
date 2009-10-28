@@ -30,9 +30,13 @@ if ( isset ($XCC))
     return;
 }
 
-if ( isset ($_POST['directory']))
-{
 
+
+
+if ( isset ($_REQUEST['directory']))
+{
+$modx->logEvent('29','3',serialize($_POST),'Fancy Upload Post');
+$modx->logEvent('29','3',serialize($_GET),'Fancy Upload Get');
 include $pluginpath.'inc/FileManager/filemanager.php';
 $savemassage='';
 }

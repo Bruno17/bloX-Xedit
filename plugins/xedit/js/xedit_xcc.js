@@ -2,7 +2,7 @@
  * @author marc
  */
 		//window.addEvent('domready', function() {
-		var startxcc = function(ajax_url,doc_id){
+		var startxcc = function(){
 		var tabs1 = new SimpleTabs('xcc_blox_block', { 					// erst Tabs einrichten, damit die Höhe für das Auswählen stimmt
 			selector: 'h4'
 		});	
@@ -18,10 +18,7 @@
 		});	
 		
 		//Bruno - das anders lösen(alle brunoclass-funktionen in die Klasse xcc packen???)
-        var brunoclass = new Mif.brunoclass({
-            ajax_url: ajax_url,
-            doc_id: doc_id
-        });
+        var brunoclass = new Mif.brunoclass();
 													
 		var xcc_start = new xcc({
             brunoclass: brunoclass

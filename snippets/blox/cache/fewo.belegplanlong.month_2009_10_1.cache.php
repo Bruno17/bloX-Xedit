@@ -1,4 +1,4 @@
-a:2:{i:0;i:1284980736;i:1;s:24413:"<table class="tableFreieTermine">
+a:2:{i:0;i:1286552420;i:1;s:24925:"<table class="tableFreieTermine">
 	<thead>
 		<tr>
 			<th></th>
@@ -603,16 +603,20 @@ a:2:{i:0;i:1284980736;i:1;s:24413:"<table class="tableFreieTermine">
 
 
 
-
-
-
-    <li class="frei blox " xedit_tabs="@CONFIG" chunkname="reservation" 
-	title="Wohnung1: frei" >
+		<li class="frei_abr blox" xedit_tabs="@CONFIG" chunkname="reservation"
+				title="Wohnung1:Abreise frei" >
+		</li>
 		
-    	<a class="btnnew save" title="Wohnung1 ab 16.10.2009  belegen" href="[~67~]?newday=16&newmonth=10&newyear=2009&callID=64&callmonth=10&callyear=2009&room_ID=66&room_title=Wohnung1">+</a>
-		
+		<li class="belegt_anr blox" xedit_tabs="@CONFIG" chunkname="reservation"
+			title="Wohnung1:Hans 16.10.2009-17.10.2009" >
+				
+				<a class="btnedit save" title="Wohnung1: Hans 16.10.2009-17.10.2009" href="[~1112~]?eventID=143&callmonth=10&callyear=2009&room_ID=66&room_title=Wohnung1&callID=64">o</a>
+				  
+		</li>
 
-	</li> 
+
+
+
 
 
 </ul>		
@@ -620,19 +624,26 @@ a:2:{i:0;i:1284980736;i:1;s:24413:"<table class="tableFreieTermine">
 <td>
 <ul>	
 
+		<li class="belegt_abr blox" xedit_tabs="@CONFIG" chunkname="reservation"
+			title="Wohnung1:Hans 16.10.2009-17.10.2009" style="background-color:#a95c73;">
+				
+				<a class="btnedit save" title="Wohnung1: Hans 16.10.2009-17.10.2009" href="[~1112~]?eventID=143&callmonth=10&callyear=2009&room_ID=66&room_title=Wohnung1&callID=64">o</a>
+				  
+		</li>
 
-
-
-
-
-
-    <li class="frei blox " xedit_tabs="@CONFIG" chunkname="reservation" 
-	title="Wohnung1: frei" >
+		<li class="frei_anr blox" xedit_tabs="@CONFIG" chunkname="reservation"
+				title="Wohnung1: frei" >
+					
+					<a class="newicon save" title="Wohnung1 ab 17.10.2009  belegen" href="[~67~]?newday=17&newmonth=10&newyear=2009&callID=64&callmonth=10&callyear=2009&room_ID=66&room_title=Wohnung1">+</a>
+					 
+		</li>
 		
-    	<a class="btnnew save" title="Wohnung1 ab 17.10.2009  belegen" href="[~67~]?newday=17&newmonth=10&newyear=2009&callID=64&callmonth=10&callyear=2009&room_ID=66&room_title=Wohnung1">+</a>
-		
 
-	</li> 
+
+
+
+
+
 
 
 </ul>		

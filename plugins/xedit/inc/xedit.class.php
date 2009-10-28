@@ -548,6 +548,16 @@ class xedit {
     function makeAjaxUrl() {
         global $modx;
         $managerPath = $modx->getManagerPath();
+        if ($this->userPermissions['runajaxsnippet'] == '1') {
+            $rs=$modx->db->select('id',$this->tbl_sc,"pagetitle='Xedit_AJAX'");
+            $docs=$modx->db->makeArray($rs);
+            if (count($docs)>0) {
+            //$ajax_url = $modx->makeUrl('508');
+                $ajax_urls['ajax_url'] = $modx->makeUrl($docs[0]['id']);
+				$ajax_urls['front_ajax_url'] = $ajax_urls['ajax_url'];
+            }
+        //$ajax_url = "index.php?id=508";
+        }		
         if ($this->userPermissions['runajaxmodule'] == '1') {
             include_once($this->pluginpath.'/inc/module.class.inc.php');
             $module = new Module;
@@ -555,21 +565,39 @@ class xedit {
             $moduleID = $module->id;
             $moduleActionID = 112;
             $moduleURL = $managerPath.'index.php?a='.$moduleActionID.'&id='.$moduleID;
-            $ajax_url = $moduleURL;
-        }
-        elseif ($this->userPermissions['runajaxsnippet'] == '1') {
-            $rs=$modx->db->select('id',$this->tbl_sc,"pagetitle='Xedit_AJAX'");
-            $docs=$modx->db->makeArray($rs);
-            if (count($docs)>0) {
-            //$ajax_url = $modx->makeUrl('508');
-                $ajax_url = $modx->makeUrl($docs[0]['id']);
-            }
-        //$ajax_url = "index.php?id=508";
+            $ajax_urls['ajax_url'] = $moduleURL;
+			$ajax_urls['back_ajax_url'] = $moduleURL;
         }
 
-        return $ajax_url;
+
+        return $ajax_urls;
     }
 
+    function makeFileManagerPath($fieldtype){
+ 
+//default
+$params['filemanager']['image_path']='images/';
+$params['filemanager']['file_path']='files/';
+
+//different path per page:
+$params['filemanager']['image_path_TV']='imagespath';//used if not empty
+$params['filemanager']['file_path_TV']='filespath';//used if not empty
+
+//different path per row:
+$params['filemanager']['image_path_FIELD']='imagespath';//used if not empty
+$params['filemanager']['file_path_FIELD']='filespath';//used if not empty
+
+//different path per user: is used if path = @USER in one of above path-configs
+//you can also use @USERID in all of above configs as part of path
+$params['filemanager']['image_path_user']='userfolders/@USERID/images/';
+$params['filemanager']['file_path_user']='userfolders/@USERID/files/'; 
+ 
+ 
+        $path=$this->container['params']['filemanager'][$fieldtype.'_path'];
+    	
+		return $path;
+    	
+    }
 
     function getContainerTVids($docid) {
         global $modx;
@@ -2573,6 +2601,7 @@ class xedit_db {
 
     function process($chunk, $container) {
         global $modx;
+		
         $GLOBALS['savedoc'] = true;
         $this->invokearray = array ('mode'=>'new');
         $this->invokemode = 'new';
@@ -2673,8 +2702,22 @@ class xedit_db {
 
     function setfield($field) {   global $modx;
 
-        if ( isset ($_POST[$field['postname']])) {
-            $field['value'] = $_POST[$field['postname']];
+        
+        $postname=str_replace('[]','',$field['postname']);
+       
+        if ( isset ($_POST[$postname])) {
+        	
+                if (is_array($_POST[$postname])) {
+                // handles checkboxes & multiple selects elements
+                    $feature_insert = array ();
+                    $lst = $_POST[$postname];
+                    while (list ($featureValue, $feature_item) = each($lst)) {
+                        $feature_insert[count($feature_insert)] = $feature_item;
+                    }
+                    $field['value'] = implode("||", $feature_insert);
+                } else {
+                    $field['value'] = $_POST[$postname];
+                }			
         }
         //convert images from directresize
         // Todo find a way to process array-fields (checkbox etc.)		

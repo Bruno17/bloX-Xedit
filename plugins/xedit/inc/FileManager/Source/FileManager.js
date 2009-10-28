@@ -71,6 +71,7 @@ var FileManager = new Class({
 		this.dragZIndex = 1300;
 		this.droppables = [];
 		this.Directory = this.options.directory;
+		this.fieldtype = this.options.fieldtype;//added by Bruno for xedit
 
 		this.language = $unlink(FileManager.Language.en);
 		if (this.options.language != 'en') this.language = $merge(this.language, FileManager.Language[this.options.language]);
@@ -322,7 +323,8 @@ var FileManager = new Class({
 				this.fill(j, nofade);
 			}).bind(this),
 			data: {
-				directory: dir
+				directory: dir,
+				fieldtype: this.fieldtype//added by Bruno for xedit
 			}
 		}, this).post();
 	},
@@ -345,6 +347,7 @@ var FileManager = new Class({
 					data: {
 						file: file.name,
 						directory: self.Directory,
+         				fieldtype: self.fieldtype,//added by Bruno for xedit						
 						event:'destroy'
 					},
 					onSuccess: function(j){
@@ -405,6 +408,7 @@ var FileManager = new Class({
 						file: file.name,
 						name: this.el.getElement('input').get('value'),
 						directory: self.Directory,
+         				fieldtype: self.fieldtype,//added by Bruno for xedit	
 						event:'move'
 					}
 				}, self).post();
@@ -525,6 +529,7 @@ var FileManager = new Class({
 					data: {
 						file: file.name,
 						directory: self.Directory,
+         				fieldtype: self.fieldtype,//added by Bruno for xedit	
 						newDirectory: dir ? dir.dir + '/' + dir.name : self.Directory,
 						copy: e.control || e.meta ? 1 : 0,
 						event:'move'
@@ -613,7 +618,8 @@ var FileManager = new Class({
 				});
 			}).bind(this),
 			data: {
-				directory: this.Directory,
+						directory: this.Directory,
+         				fieldtype: this.fieldtype,//added by Bruno for xedit	
 				file: file.name,
 				event:'detail'
 			}

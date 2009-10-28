@@ -94,9 +94,10 @@ FileManager.implement({
 			initialize: function(base, data){
 				this.parent(base, data);
 				this.setOptions({
-					url: self.options.url + '?' + Hash.toQueryString($merge({}, self.options.uploadAuthData, {
+					url: self.options.url + '&' + Hash.toQueryString($merge({}, self.options.uploadAuthData, {//changed ? to & by Bruno for xedit in manager-module
 						event: 'upload',
 						directory: self.normalize(self.Directory),
+         				fieldtype: self.fieldtype,//added by Bruno for xedit							
 						resize: self.options.resizeImages && resizer.hasClass('checkboxChecked') ? 1 : 0
 					}))
 				});

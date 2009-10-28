@@ -13,6 +13,7 @@ if ($GLOBALS['xedit_runs'] == '1') {
     $managerPath = $modx->getManagerPath();
     $doc_id = $modx->documentObject['id'];;
     $site_url = MODX_BASE_URL;
+	$session_id = session_id(); 
     //$output= $modx->documentOutput;
 
 //quick fix: switch mootools version
@@ -43,6 +44,7 @@ $filemanager='
 
 
     $ajax_url=$GLOBALS['ajax_url'];//from onparsedocument
+    $front_ajax_url=$GLOBALS['ajax_urls']['front_ajax_url'];//from onparsedocument
 
     $_SESSION['xedit_moduleURL']=$ajax_url;
 
@@ -66,6 +68,12 @@ $filemanager='
         <script src="{$site_url}assets/plugins/xedit/js/sexyalertbox.js" type="text/javascript"></script>						
         <script src="{$site_url}assets/plugins/xedit/js/ckeditor/ckeditor.js" type="text/javascript"></script>						
 <script type="text/javascript">
+
+var ajax_url = '{$ajax_url}';
+var doc_id = '{$doc_id}';
+var sessionId = '{$session_id}';
+var front_ajax_url = '{$front_ajax_url}';
+
 window.addEvent('domready', function(){
 	
 mySortables = new blox_Sortables();
@@ -76,14 +84,10 @@ mte = new MooInline('.xedit', {
                     floating: true
                 });	 
                          
-brunoclass = new Mif.brunoclass(
-{
-    ajax_url: '{$ajax_url}',
-    doc_id: '{$doc_id}'
-});
+brunoclass = new Mif.brunoclass();
 xtoolsStart = new Mif.xtools();
-startXtools('{$ajax_url}','{$doc_id}');
-startxcc('{$ajax_url}','{$doc_id}');
+startXtools();
+startxcc();
 });
 </script>   
 <!-- End Xedit headers -->

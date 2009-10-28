@@ -1,4 +1,4 @@
-a:2:{i:0;i:1285197704;i:1;s:12300:"<table class="tableFreieTermine">
+a:2:{i:0;i:1286742517;i:1;s:12632:"<table class="tableFreieTermine">
 	<thead>
 		<tr>
 			<th></th>
@@ -573,14 +573,18 @@ a:2:{i:0;i:1285197704;i:1;s:12300:"<table class="tableFreieTermine">
 
 
 
-
-
-
-    <li class="frei blox " xedit_tabs="@CONFIG" chunkname="reservation" 
-	title="Wohnung1: frei" >
+		<li class="frei_abr blox" xedit_tabs="@CONFIG" chunkname="reservation"
+				title="Wohnung1:Abreise frei" >
+		</li>
 		
+		<li class="belegt_anr blox" xedit_tabs="@CONFIG" chunkname="reservation"
+			title="Wohnung1: 16.10.2009-17.10.2009" >
+				  
+		</li>
 
-	</li> 
+
+
+
 
 
 </ul>		
@@ -588,17 +592,22 @@ a:2:{i:0;i:1285197704;i:1;s:12300:"<table class="tableFreieTermine">
 <td>
 <ul>	
 
+		<li class="belegt_abr blox" xedit_tabs="@CONFIG" chunkname="reservation"
+			title="Wohnung1: 16.10.2009-17.10.2009" style="background-color:#a95c73;">
+				  
+		</li>
 
-
-
-
-
-
-    <li class="frei blox " xedit_tabs="@CONFIG" chunkname="reservation" 
-	title="Wohnung1: frei" >
+		<li class="frei_anr blox" xedit_tabs="@CONFIG" chunkname="reservation"
+				title="Wohnung1: frei" >
+					 
+		</li>
 		
 
-	</li> 
+
+
+
+
+
 
 
 </ul>		

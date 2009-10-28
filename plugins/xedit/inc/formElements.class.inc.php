@@ -14,8 +14,9 @@ class formElements{
 		$field_html ='';
 		$field_value = ($field_value!="" ? $field_value : $default_text);
 		
-		if ($field_type == "richtext") $classnames[]='richtext'; 
-		
+		if ($field_type == "richtext") $classnames[]='richtext';
+		if ($field_type == "image"||$field_type == "file") $classnames[]='filemanager';
+				
 		$class=count($classnames)>0?'class="'.implode(' ',$classnames).'"':'';
 		
 		switch ($field_type) {
@@ -112,7 +113,7 @@ class formElements{
 				break;
 			case "checkbox": // handles check boxes
 				$field_value = explode("||",$field_value);
-				$index_list = $this->ParseIntputOptions(ProcessTVCommand($field_elements, $field_name));
+				$index_list = $this->ParseIntputOptions($this->ProcessTVCommand($field_elements, $field_name));
 				static $i=0;
 				while (list($item, $itemvalue) = each ($index_list))
 				{
@@ -182,7 +183,7 @@ class formElements{
 					</script>";
 					$ResourceManagerLoaded  = true;					
 				} 
-				$field_html .='<input '.$class.$attributes.' type="text" id="tv'.$field_name.'" name="tv'.$field_name.'"  value="'.$field_value .'" '.$field_style.' onchange="documentDirty=true;" />&nbsp;<input type="button" value="'.$_lang['insert'].'" onclick="BrowseServer(\'tv'.$field_name.'\')" />';
+				$field_html .='<input '.$class.$attributes.' type="text" fieldtype="'.$field_type.'" id="tv'.$field_name.'" name="tv'.$field_name.'"  value="'.$field_value .'" '.$field_style.' onchange="documentDirty=true;" />&nbsp;<input type="button" value="'.$_lang['insert'].'" id="button_tv'.$field_name.'" />';
 				break;
 			case "file": // handles the input of file uploads
 			/* Modified by Timon for use with resource browser */
@@ -238,7 +239,8 @@ class formElements{
 					</script>";
 					$ResourceManagerLoaded  = true;					
 				} 
-				$field_html .='<input '.$class.$attributes.' type="text" id="tv'.$field_name.'" name="tv'.$field_name.'"  value="'.$field_value .'" '.$field_style.' onchange="documentDirty=true;" />&nbsp;<input type="button" value="'.$_lang['insert'].'" onclick="BrowseFileServer(\'tv'.$field_name.'\')" />';
+				//$field_html .='<input '.$class.$attributes.' type="text" id="tv'.$field_name.'" name="tv'.$field_name.'"  value="'.$field_value .'" '.$field_style.' onchange="documentDirty=true;" />&nbsp;<input type="button" value="'.$_lang['insert'].'" onclick="BrowseFileServer(\'tv'.$field_name.'\')" />';
+				$field_html .='<input '.$class.$attributes.' type="text" fieldtype="'.$field_type.'" id="tv'.$field_name.'" name="tv'.$field_name.'"  value="'.$field_value .'" '.$field_style.' onchange="documentDirty=true;" />&nbsp;<input type="button" value="'.$_lang['insert'].'" id="button_tv'.$field_name.'" />';
                 
 				break;
 			default: // the default handler -- for errors, mostly
@@ -391,7 +393,7 @@ function ParseCommand($binding_string) {
 
 function makeFormelement($tv,$prefix='tv', $attributes='',$classnames=array())
 {
-	       
+    
 	//require_once ('tmplvars.inc.php');
     //require_once ('tmplvars.commands.inc.php');
     //require ('tmplvars.format.inc.php');// add by Bruno

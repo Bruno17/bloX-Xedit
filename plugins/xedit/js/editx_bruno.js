@@ -7,27 +7,32 @@ Mif.Tree
  * @author marc
  */
 
-            var startXtools = function(ajax_url,doc_id){
-                //console.log(doc_id);
-				//var ajax_url=ajax_url;
-				//Slimbox.scanPage();
-				
+var runfilemanager = function(el){
 			/* Filemanager - Simple Example */
-			var baseURL = 'assets/';
-			var startDir = 'galleries/62';
-			var el = $('testfeld');	
+			var elid=el.get('id');
+			var fieldtype=el.get('fieldtype');
+			var baseURL = 'assets/';//modx-zugriff
+			var startDir = '';
+			var el = $(elid);
+			//var ajax_url = front_ajax_url;
+			/*
+			var ajax_url = 'manager.php';
+			var baseURL = './assets/';//manager.php-zugriff	
+			*/
 			var manager1 = new FileManager({
 				url: ajax_url,
 				assetBasePath: 'assets/plugins/xedit/inc/FileManager/Assets',
 				directory: startDir,
 				baseURL: baseURL,
+				fieldtype: fieldtype,
 				language: 'de',
 				selectable:true,
-				uploadAuthData: {session: 'MySessionId'},
+				uploadAuthData: {session: sessionId},
 				onComplete: function(path, file){
 				el.set('value', baseURL+path);
 				}
 			});
+			manager1.show();
 			
 			/* gallery-test
 			var manager1 = new FileManager.Gallery({
@@ -47,11 +52,15 @@ Mif.Tree
 				}
 			});			 
 			 
-			 */			
-			
-			var button = $('example1');
-			if (button) button.addEvent('click', manager1.show.bind(manager1));					
-			/* End Filemanager Examples */	
+			 */
+			/* End Filemanager Examples */				
+}
+
+            var startXtools = function(){
+                //console.log(doc_id);
+				//var ajax_url=ajax_url;
+				//Slimbox.scanPage();
+	
 				
 				var unremoveables = $$('.unremoveable');
 				var unfillables = $$('.fillable_0 , .xcc_bloxcontainer');
@@ -208,8 +217,8 @@ Mif.brunoclass = new Class({
     
     initialize: function(options){
         this.setOptions(options);
-        this.ajax_url = options.ajax_url;
-		this.doc_id = options.doc_id;
+        this.ajax_url = ajax_url;
+		this.doc_id = doc_id;
         var brunoclass = this;
 		var level1 = $$('.xcc_level1');
         level1.each(function(el, i){
@@ -717,6 +726,7 @@ Mif.brunoclass = new Class({
     
     },
     insertTvTabs: function(responseText){
+
 				var editspans = this.editingElement.getElements('.xedit, .xedit_input');
 				var blox_area_edit=$('xcc_blox_block_edit');
 				if (blox_area_edit){
@@ -860,7 +870,6 @@ Mif.brunoclass = new Class({
 					
 				}
 
-
                 //date-picker               
                 if (el.hasClass('fdp')) {
                     var dpid = el.get('id');
@@ -872,9 +881,26 @@ Mif.brunoclass = new Class({
 
                     datePickerController.destroyDatePicker(dpid);
                     datePickerController.createDatePicker(opts);
+   
                     
-                    
-                }				
+                }	
+				
+                //filemanager              
+                
+                if (el.hasClass('filemanager')) {
+					var elid=el.get('id');
+                    var button = $('button_'+elid);
+                    //if (button) button.addEvent('click', manager1.show.bind(manager1));
+                    if (button) 
+                        button.removeEvents('click');
+                    button.addEvent('click', function(e){
+                        e.stop();
+                        runfilemanager(el);
+                        
+                    });
+                  
+                }					
+							
 				});
 		
 				
