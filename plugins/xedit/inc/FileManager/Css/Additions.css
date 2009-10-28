@@ -1,0 +1,116 @@
+/* TIPS */
+.tip-filebrowser {
+	z-index: 1201;
+}
+.tip-filebrowser .tip {
+	background: #000;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+}
+ 
+.tip-filebrowser .tip-title {
+	color: #fff;
+	font-size: 11px;
+	padding: 1px 4px;
+	line-height: 21px;
+	text-align: center;
+	font-weight: bold;
+}
+ 
+.tip-filebrowser .tip-text {
+	display: none;
+}
+
+/* Overlay */
+div.overlay {
+	position: absolute;
+	left: 0;
+	top: 0;
+	display: none;
+	
+	z-index: 999;
+	background: #aaa;
+}
+
+/* Dialog */
+div.overlay-dialog {
+	z-index: 1999;
+	background: #fff;
+}
+
+div.dialog-engine-trident4 { width: 249px; }
+
+div.dialog {
+	position: absolute;
+	display: none;
+	z-index: 2000;
+	
+	width: 229px;
+	height: 121px;
+	
+	color: #bebebe;
+	font-family: Tahoma, sans-serif;
+	font-size: 12px;
+	background: url(../Assets/dialog.png) no-repeat;
+}
+div.dialog a {
+	color: #aaa;
+}
+div.dialog a:hover {
+	text-decoration: none;
+}
+
+div.dialog div {
+	margin: 10px;
+}
+
+div.dialog input, div.dialog select {
+	width: 94%;
+	margin: 20px 2%;
+	padding: 2px 1%;
+	border: 1px solid #bebebe;
+	background: #fff;
+	
+	color: #333;
+	font-family: Tahoma, sans-serif;
+	font-size: 12px;
+}
+
+div.dialog-engine-trident4 input, div.dialog-engine-trident5 input {
+	width: 80%;
+}
+
+div.dialog button {
+	position: absolute;
+	bottom: 15px;
+	right: 15px;
+	
+	width: auto;
+	height: 22px;
+	padding: 2px;
+	border: 1px solid #bebebe;
+	
+	cursor: pointer;
+	color: #333;
+	text-shadow: #eee 1px 1px 1px;
+	
+	font-family: Tahoma, sans-serif;
+	letter-spacing: 0;
+	font-size: 12px;
+	font-weight: normal;
+	margin: 0;
+	background: url(../Assets/button.png) repeat-x;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+}
+div.dialog-engine-trident4 button, div.dialog-engine-trident5 button {
+	padding: 0 .25em;
+	overflow: visible;
+}
+
+div.dialog button.dialog-decline {
+	right: auto;
+	left: 15px;
+}

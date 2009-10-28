@@ -1,0 +1,74 @@
+<?php
+/******************************************
+ *    Snippet: loopDbChunk						*
+ ******************************************
+ *
+ *		
+ *		description: 
+ *			this snippet will loop over a database table and for 
+ *			each row will inject some (or all) of the fields into placeholders
+ *			contained in a chunk.
+ *			
+ *  parameters:
+ *			
+ *			tableName	- 	the relevant table name (required, unless 'sql' is defined)
+ *	 		
+ *			chunkName 	- 	the name of the chunk to format the data (required)
+ *			
+ *			orderby 		- 	a database field name to order the results by.
+ *								add 'desc' to get the results in a reverse order.	
+ *	 		
+ *			sql			-	a custom sql query.
+ *								when this parameter is set, the 'orderby' 
+ *								parameters will be ignored.
+ *								if this parameter is not set, the query will select all the columns
+ *								from the given table.  
+ * 			
+ *			missingValTxt 	- 	an optional string to display when a database value
+ *								is missing (defaults to 'Not Available').	
+ *			
+ *			perPage		-  the number of items per page. (default: 0)
+ *			
+ *			numLinks		-  the number of page-number links shown from each side
+ *								of the current page number. (	default: 3)	
+ *								
+ *       header      -  text to be put before the loop 
+ *			
+ *       footer      -  text to put after the loop
+ *		
+ */
+
+$ldPath =  $modx->config['base_path'] .  'assets/snippets/loopDbChunk/';
+include_once($ldPath . 'transformFuncs.php');
+
+$ldParam = array();	
+if (! isset($tableName)) {
+   if(! isset($sql)) {
+	  die('loopDbChunk: \'tableName\' AND \'sql\' parameters are missing! (one of them reuired. exiting...');
+   }
+}
+else {
+	$ldParam['table'] = $tableName;
+}
+
+if (! isset($chunkName)) {
+	die('loopDbChunk: \'chunkName\' parameter missing! exiting...');
+}
+else {
+	$ldParam['chunk'] = $chunkName;
+}
+
+$ldParam['sql'] = isset($sql) ? $sql : '';
+$ldParam['order'] = isset($orderby) ? $orderby : ''; 
+$ldParam['missingTxt'] = isset($missingValTxt) ? $missingValTxt : 'Not Available'; 
+$ldParam['per_page'] = isset($perPage) ? intval($perPage) : 0;
+$ldParam['num_links'] = isset($numLinks) ? intval($numLinks) : 3;
+$ldParam['header'] = isset($header) ? $header : '';
+$ldParam['footer'] = isset($footer) ? $footer : '';
+
+require_once($ldPath . 'LoopDBChunk.php');
+
+
+$looper = new LoopDBChunk($ldParam);
+return $looper->renderChunks();
+?>

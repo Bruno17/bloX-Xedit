@@ -1,0 +1,245 @@
+@charset 'utf-8';
+@import url(reset.css);
+
+
+/* ----------------------------------------------------- All browsers */
+body{
+color: #000;
+font-family: verdana, arial, sans-serif;
+background: #FFF top left repeat-x;
+font-size: 12px;
+line-height: 1.5;
+}
+
+
+
+strong{
+	font-weight: bold;
+}
+
+.introduction {
+	width: 700px;
+	line-height: 1.5;
+	float: right;
+}
+
+a{
+	color: #B132B9;
+		text-decoration: underline;
+}
+
+em{
+	font-style: italic;
+}
+
+
+
+.introduction h1, .introduction h2, .introduction h3, .teil1 h2{
+	font-family: 'Trebuchet MS', verdana, sans-serif;
+	font-size: 18px;
+	color: #5FA222;
+	font-weight: bold;
+	margin-bottom: 10px;
+	}
+
+.introduction h2, .teil1 h2{
+	font-size: 16px;
+	}
+	
+.introduction h3, div#hidetoggle{
+	font-size: 14px;
+	color: #B132B9;
+	}
+
+
+div#hidetoggle{
+	text-decoration: underline;
+	font-weight: bold;
+	cursor: pointer;
+	}
+
+/* Layout settings */
+
+#wrapper {
+width: 979px;
+margin: 0px auto 0px auto;
+position: relative;
+padding-top: 40px;
+background: transparent url(images/logo.png) 20px 50px no-repeat;
+height:100px;
+}
+
+.handle {
+	cursor: move;
+}
+
+#chunks h2 {
+	font-weight: bold;
+	display: inline;
+	font-size: 12px;
+	margin-right: 10px;
+}
+
+#chunks {
+	height: 25px; 
+	background:#BCBECD url('images/background_silver.jpg');
+	width: 100%;
+	position: fixed;
+	top: 0;
+	left: 0;
+	padding-top: 5px;
+	z-index: 100;
+}
+
+a#showControls{
+	display: block;
+	width: 150px;
+	height: 70px;
+	position: absolute;
+	left: 20px;
+	top: 50px;
+	cursor: pointer;
+}
+
+#chunks a.button {
+	padding: 4px;
+	margin: 5px;
+	border: 1px solid #333;
+	color: #333;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+.blox {
+	position: relative;
+}
+
+.blox h2{
+	font-size: 14px;
+	font-weight: bold;
+	}
+	
+.blox .xtools {
+	position: absolute;
+	top: 0;
+	right: 0px;
+	width: 100px;
+}
+
+.xtools span{
+	display: block;
+	width: 25px;
+	height: 25px;
+	float: right;
+	background: #EFEFEF;
+	margin-left: 2px;
+	text-indent: -23234px;
+	}
+
+.xtools span.save{
+	background: url(images/icons_09.png) top left no-repeat;
+	cursor: pointer;
+	position: absolute; 
+	top: -12px;
+	right: 23px;
+	}
+	
+.xtools span.xtrash{
+	background: url(images/icons_11.png) top left no-repeat;
+	cursor: crosshair;
+	position: absolute; 
+	top: -12px;
+	right: 51px;
+	}
+
+.xtools span.drag{
+	background: url(images/icons_07.png) top left  no-repeat;
+	cursor: move;
+	position: absolute; 
+	top: -12px;
+	right: -5px;
+	}
+
+.xtools span.remove{
+	background: url(images/CC_icon_cancel.png) no-repeat left top;
+	cursor: crosshair;
+	position: absolute; 
+	top: -12px;
+	right: 79px;
+	}
+
+
+
+#message{
+border:1px solid grey;
+margin:20px;
+padding:10px;
+	
+}
+
+
+#chunks .blox {
+	display : none;
+}
+
+	
+
+.bildchunk {
+	padding: 5px;
+	border: 1px solid #CCC;
+	text-align: left;
+	margin: 20px;
+
+}
+
+
+.bildchunk div.caption{
+	font-size: 11px;
+	font-style: italic;
+}
+
+ul{
+	margin-top: 15px;
+}
+
+.floatleft {
+	float: left;
+	margin-right: 10px;
+}
+
+p img {
+max-width:100%;
+padding:0;
+}
+
+p{
+	margin-bottom: 15px;
+	 
+}
+
+ul,li {
+	margin-left: 15px;
+	list-style: disc;
+	margin-bottom: 5px;
+}
+
+ol, ol li {
+	list-style: decimal;
+}
+
+div.blox.published_0 {
+	 border: 1px solid red !important;
+}
+
+.menuindex {
+color:blue;
+font-size:20px;
+position:absolute;
+right:5px;
+top:0;
+	
+}
+
+.hidden {
+	display:none;
+}

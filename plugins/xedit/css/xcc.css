@@ -1,0 +1,410 @@
+/* Das Panel und das erste Level */
+
+#log {
+	position: absolute;
+	left: 0px;
+	top: 40px;
+	width: 300px;
+	height: 200px;
+	border: 1px solid red;
+	overflow: auto;
+	z-index: 500;
+	background: #000;
+	color: #FFF;
+	display: none;
+}
+
+#xcc{
+	position: fixed;
+	bottom: 0px;
+	left: 0px;
+	width: 100%;
+	z-index: 700;
+	background: url(images/area_back_all.png) 0px 58px repeat-x;
+	opacity: 0.5;
+}
+
+span#minimize{
+	background: url(images/minimize.png) -27px top no-repeat;
+	display: block;
+	width: 20px;
+	height: 20px;
+	position: absolute;
+	left: 10px;
+}
+
+span#minimize.maximize{
+	background-position: 0px 0px;
+}
+
+#xcc_panel {	
+	width: 100%;
+	border-bottom: 5px solid #000;	
+	height: 53px;
+	background: url(images/CC_panel_back.png) bottom repeat-x;
+	color: #FFF;
+}
+
+#xcc .xcc_level1 a{
+	color: #FFF;
+	text-decoration: none;
+	font-weight: bold;
+	padding-left: 60px;
+	white-space: nowrap;
+	}
+
+.xcc_level1 {
+	float: left;
+	margin-left: 10px;
+	background: url(images/CC_icon_back.png) no-repeat;
+	background-position: 0px 60px;
+	height: 53px;
+	overflow: hidden;
+	padding-left: 15px;
+	opacity: 0;
+
+}
+
+.level1_inner{
+	padding-right: 7px;
+	height: 55px;
+	line-height: 60px;
+	padding-left: 0px;
+	background-position: 5px 12px;
+	}
+
+.xcc_active{
+	background-position: 0px 0px;
+}
+
+#xcc .xcc_area_blox{
+	margin-left: 40px;
+}
+
+#xcc .xcc_area_blox .level1_inner{
+		background: url(images/CC_icon_blox.png) 0px 12px no-repeat;
+}
+
+#xcc .xcc_area_settings .level1_inner{
+	background: url(images/CC_icon_settings.png) 0px 12px no-repeat;
+}
+
+
+#xcc .xcc_area_tvs .level1_inner{
+	background: url(images/CC_icon_tv.png) 0px 12px no-repeat;
+}
+
+#xcc .xcc_area_blox_edit .level1_inner{
+	background: url(images/CC_icon_edit_block.png) 0px 12px no-repeat;
+}
+
+
+#xcc .xcc_level1_active{
+	background-position: 0px 0px;
+}
+
+.xcc_area{
+	position: absolute;
+	width: 100%;
+	z-index: 1000;
+}
+
+
+.xcc_area_inner{
+	margin: 10px 45px 10px 45px;
+	color: #FFF;
+}
+
+/* Tabs */
+
+
+.tab-wrapper
+{
+	clear:					both;
+	position: 				relative;
+	z-index: 1100;
+}
+.tab-menu
+{
+	margin:					0 0 0 5px;
+	padding:				0;
+	list-style:				none;
+	overflow:				auto;
+}
+.tab-menu li
+{
+	list-style: none;
+	margin:					0;
+	padding:				0;
+	float:					left;
+	line-height:			22px;
+}
+.tab-menu li a
+{
+	padding:				10px;
+	font-weight:			bold;
+	color: #aaa;
+	text-decoration: none;
+}
+.tab-menu li a:hover,
+.tab-menu li a:focus
+{
+	color: #ddd;
+	/* your effect here */
+}
+.tab-menu li.tab-selected a
+{
+	text-decoration:		none;
+	color:					#FFF;
+	/* your effect here */
+}
+
+.tab-container{
+	border: 1px solid #aaa;
+	padding: 5px 10px;
+	margin: 5px 10px 10px 10px;
+	float:left;
+}
+
+/* Formulare */
+div.xcc_tabs_column{
+	width: 270px;
+	float: left;
+	margin-right: 10px;
+}
+
+div.xcc_formelement {
+	width: 260px;
+	padding: 0px 5px 0px 5px;
+	position: relative;
+}
+
+div.xcc_formelement label{
+font-weight: normal;
+display: block;
+position: relative;
+font-size: 16px;
+border-bottom: 1px solid #666;
+padding: 10px 0px 5px 5px;
+	}
+
+
+div.xcc_formelement label:hover{
+	background: #282828 url(images/CC_icon_edit2.png) 234px 4px no-repeat;
+	}
+
+div.xcc_formelement.active label, div.xcc_formelement.active label:hover{
+	background: #282828;
+	}
+
+div.xcc_formelement label span.value{
+	font-size: 10px;
+	display: block;
+	max-height: 32px;
+	overflow: hidden;
+	background: url(images/CC_punkte.png) 242px 26px no-repeat;
+	}
+
+div.xcc_formelement label span.edited{
+	color: #f2e740;
+	}
+
+div.xcc_formelement input,div.xcc_formelement textarea,div.xcc_formelement select{
+	
+	}
+
+div.xcc_formelement input[type=checkbox]{
+	width: 15px;
+}
+	
+div.xcc_formelement input, div.xcc_formelement textarea{
+	border: 0px;
+	background: #FFF;
+	color: #000;
+	font-size: 13px;
+	font-family: arial,verdana,sans-serif;
+	padding: 2px;
+	float: left;
+}
+
+div.xcc_formelement textarea{
+	height: 100px;
+}
+
+div.xcc_formelement label input, div.xcc_formelement label textarea,  div.xcc_formelement label .fieldvalues{
+	display: none;
+}
+
+div.xcc_formelement_top{
+	width: 289px;
+	height: 8px;
+	background: #282828 url(images/CC_form_box_top.png) top left no-repeat;
+}
+
+div.xcc_formelement_bottom{
+	width: 289px;
+	height: 7px;
+	background: #282828 url(images/CC_form_box_bottom.png) top left no-repeat;
+}
+
+div.xcc_formelement_all{
+	background: #282828;
+	width: 279px;
+	overflow: hidden;
+	padding: 10px 5px 10px 5px;
+	}
+
+div.xcc_formelement_box {
+	width: 289px;
+	position: absolute;
+	left: 263px;
+	top: 0px;
+	z-index: 1100;
+	display: block;
+}
+
+div.xcc_formelement_box.xcc_left {
+	left: -284px;
+	}
+
+span.xcc_form_submit{
+	display: block;
+	position: absolute;
+	right: 5px;
+	top: 16px;
+	width: 26px;
+	height: 24px;
+	background: url(images/CC_form_box_submit.gif) top left no-repeat;
+	cursor: pointer;
+}
+
+div.xcc_formelement .fieldvalues{
+
+}
+
+div.xcc_formelement .fieldvalues input{
+	clear: left;
+	margin-right: 3px;
+	margin-bottom: 4px;
+	}
+
+div.xcc_formelement input:focus{
+
+}
+
+/* Notifications */
+.roar-body
+{
+	position:				absolute;
+	font:					12px/14px "Lucida Grande", Arial, Helvetica, Verdana, sans-serif;
+	color:					#fff;
+	text-align:				left;
+	z-index:				999;
+}
+
+.roar
+{
+	position:				absolute;
+	width:					300px;
+	cursor:					pointer;
+}
+.roar-bg
+{
+	position:				absolute;
+	z-index:				1000;
+	width:					100%;
+	height:					100%;
+	left:					0;
+	top:					0;
+	background-color:		#000;
+	-moz-border-radius:		10px;
+	-webkit-border-radius:	5px;
+	-webkit-box-shadow:		0 0 5px rgba(0, 0, 0, 0.5);
+}
+.roar-body-ugly .roar
+{
+	background-color:		#333;
+}
+.roar-body-ugly .roar-bg
+{
+	display:				none;
+}
+.roar h3
+{
+	position:				relative;
+	padding:				15px 10px 0;
+	margin:					0;
+	border:					0;
+	font-size:				13px;
+	color:					#fff;
+	z-index:				1002;
+	font-weight: bold;
+}
+.roar p
+{
+	position:				relative;
+	padding:				10px 10px 15px;
+	margin:					0;
+	font-size:				12px;
+	color:					#fff;
+	z-index:				1002;
+}
+
+/* Save Button */
+#saveall {
+	display: block;
+	width: 34px;
+	height: 34px;
+	position: absolute;
+	right: 15px;
+	top: 12px;
+	background: url(images/CC_icon_save.png) top left no-repeat;
+	cursor: pointer;
+}
+
+#xcc_edit_cancel{
+	display: block;
+	width: 34px;
+	height: 34px;
+	position: absolute;
+	right: 15px;
+	top: 35px;
+	text-indent: 345px;
+	overflow: hidden;
+	background: url(images/CC_icon_cancel.png) top left no-repeat;
+	cursor: pointer;
+}
+
+#xcc_edit_save {
+background:transparent url(images/icons_09.png) no-repeat scroll left top;
+cursor:pointer;
+height:26px;
+position:absolute;
+right:69px;
+text-indent:0;
+top:4px;
+width:26px;
+}
+
+.xcc_button {
+background-color:#FFFFFF;
+border:1px solid;
+color:#000000;
+cursor:pointer;
+float:left;
+font-size:11px;
+font-weight:bold;
+list-style-image:none;
+list-style-position:outside;
+list-style-type:none;
+margin:10px;
+padding:12px;
+position:relative;
+text-decoration:none;
+}
+
+/* von Bruno */
+
+#xcc_blox_block .blox {
+display:none;
+}
