@@ -26,9 +26,9 @@ $params['tv_tabs'][4]='@TV:tvTabs';//XCC - Tabs for TV-tab
 
 //XCC xeditTabs for bloxparameter &xeditTabs=`@CONFIG` uses chunkname for key:
 //for chunkname see chunkname in html-sourcecode
-$params['xeditTabs']['titlecontent']='Content:content;richcontent,pagetitle||Sonstige Tvs:chunkname,isfolder';
-$params['xeditTabs']['imagecaption']='Content:content||Sonstige Tvs:pagetitle,chunkname,bild,isfolder';
-$params['xeditTabs']['wayfinder']='Parameter:startId,sortBy,sortOrder||Sonstige Tvs:hidden:pagetitle,chunkname,isfolder';
+$params['xeditTabs']['titlecontent']='Content:content;richcontent,pagetitle||Sonstige Tvs:chunkname,deleted;deleteMe';
+$params['xeditTabs']['imagecaption']='Content:content||Sonstige Tvs:pagetitle,chunkname,bild,datei,deleted;deleteMe';
+$params['xeditTabs']['wayfinder']='Parameter:startId,sortBy,sortOrder||Sonstige Tvs:hidden:pagetitle,chunkname,deleted;deleteMe';
 $params['xeditTabs']['reservation']='Reservation bearbeiten:@CHUNK:reservation';
 
 //try with events 
@@ -41,7 +41,24 @@ $params['onbeforesave']['reservation']='@CHUNK:reservation';
 $params['chunk_SettingFields']='blox_template:text,ditto_hiddenfields:text,xedit_tabs:textarea';
 $params['template_SettingFields']='blox_settings:textarea,setting_tabs:textarea,tv_tabs:textarea,xedit_tabs:textarea';
 
+//default
+$params['filemanager']['image_path']='images/';
+$params['filemanager']['file_path']='files/';
 
+//different path per page:
+$params['filemanager']['image_path_TV']='imagespath';//used if not empty
+$params['filemanager']['file_path_TV']='filespath';//used if not empty
+
+//different path per row:
+$params['filemanager']['image_path_FIELD']='imagespath';//used if not empty
+$params['filemanager']['file_path_FIELD']='filespath';//used if not empty
+
+//different path per user: is used if path = @USER in one of above path-configs
+//you can also use @USERID in all of above configs as part of path
+$params['filemanager']['image_path_user']='userfolders/@USERID/images/';
+$params['filemanager']['file_path_user']='userfolders/@USERID/files/';
+
+//if path not exists, it would be created, when filemanager opens
 
 //examples:
 //$permissions_web['moderatoren']='caneditowndocs,cancreatedocs';
