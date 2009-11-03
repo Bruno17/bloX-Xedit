@@ -1,0 +1,24 @@
+<?php
+//////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// PASTE THE CONTENTS OF THIS FILE INTO MODx WHEN INSTALLING THIS SNIPPET
+// 
+// Snippet Name: 		bloX
+// Short Description: 	snippet to list and prepare ressources for Xedit in modx
+
+// Author: 				Bruno Perner <b.perner@gmx.de>
+
+
+// Path where bloX is installed
+$bloxpath="assets/snippets/blox/";
+//define(XETT_PATH, "assets/snippets/xett/");
+$GLOBALS['blox_path']=$bloxpath;
+//
+//include snippet file
+$output = "";
+include($modx->config['base_path'].$bloxpath.'blox.php');
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+return $output;
+?>
