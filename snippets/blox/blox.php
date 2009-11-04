@@ -53,6 +53,7 @@ if (file_exists($adodbFile)) {
 
 $bloxconfig['id'] = isset($id) ? $id : ''; // [ string ]
 $bloxconfig['id_'] = isset($id) ? $id.'_' : ''; // [ string ]
+$bloxconfig['distinct'] = isset($distinct)&&$distinct=='0' ? '' : 'distinct'; // 1 or 0 [ string ]
 $bloxconfig['projectname']=(isset($project))?$project:'blox';
 $bloxconfig['tablename']=(isset($tablename))?$tablename:'';
 $bloxconfig['resourceclass']=($bloxconfig['tablename']!=='')?'modTable':'modDocument';

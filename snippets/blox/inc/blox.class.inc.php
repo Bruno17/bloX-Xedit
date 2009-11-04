@@ -1140,11 +1140,11 @@ class blox {
             }
         }
         */
-        $rs = $modx->db->select('id', $table, $where);
+        $rs = $modx->db->select($this->bloxconfig['distinct'].' '.$fields, $table, $where);
         $this->totalCount = $modx->db->getRecordCount($rs);
 
-        $rs = $modx->db->select($fields, $table, $where, $orderBy, $start.', '.$perPage);
-        $cols = $modx->db->getColumnNames( $rs );	// Get column names - in the order you select them     
+        $rs = $modx->db->select($this->bloxconfig['distinct'].' '.$fields, $table, $where, $orderBy, $start.', '.$perPage);
+        $this->columnNames = $modx->db->getColumnNames( $rs );	// Get column names - in the order you select them     
         $rows = $modx->db->makeArray($rs);    
     
         return $rows;
@@ -1271,7 +1271,7 @@ class blox {
          }
          */
     
-        $Fields = implode(',', $Fields);
+        $Fields = $this->bloxconfig['distinct'].' '.implode(',', $Fields);
         $Froms = implode(',', $Froms);
         // Build query
         $sql = "
