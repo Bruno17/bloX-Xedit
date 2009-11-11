@@ -75,8 +75,8 @@ $params['filemanager']['file_path_user']='userfolders/@USERID/files/';
  * 
  */
 
-$permissions_mgr['admins']='caneditalldocs,cancreatedocs,canseeunpublisheddocs';
-$permissions_web['admins']='caneditalldocs,cancreatedocs';
+$permissions_mgr['admins']='runxedit,caneditalldocs,cancreatedocs,canseeunpublisheddocs';
+$permissions_web['admins']='runxedit,caneditalldocs,cancreatedocs';
 //$permissions_web['moderatoren']='canseeunpublisheddocs';
 
 

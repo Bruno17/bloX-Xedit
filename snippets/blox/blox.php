@@ -148,8 +148,8 @@ $bloxconfig['container']=(isset($container))?$container:'';//destination for blo
 
 $bloxconfig['showdeleted']=(isset($showdeleted))?$showdeleted:'0';//0 = no, 1 = yes, 2 = only deleted
 $bloxconfig['showunpublished']=(isset($showunpublished))?$showunpublished:'0';
-$bloxconfig['dragbtn']=(isset($dragbtn))?$dragbtn:'1';
-$bloxconfig['trashbtn']=(isset($trashbtn))?$trashbtn:'1';
+$bloxconfig['dragbtn']=(isset($dragbtn))?$dragbtn:'0';
+$bloxconfig['trashbtn']=(isset($trashbtn))?$trashbtn:'0';
 $bloxconfig['savebtn']=(isset($savebtn))?$savebtn:'1';
 $bloxconfig['removebtn']=(isset($removebtn))?$removebtn:'0';
 

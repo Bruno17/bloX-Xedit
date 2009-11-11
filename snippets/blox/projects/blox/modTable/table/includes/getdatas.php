@@ -1,12 +1,11 @@
 <?php
+$perPage = $this->bloxconfig['perPage'];
 /*
 $where = $this->bloxconfig['where'];
 $orderBy = $this->bloxconfig['orderBy'];
 $pageStart = $this->bloxconfig['pageStart'];
-$perPage = $this->bloxconfig['perPage'];
 $numLinks = $this->bloxconfig['numLinks'];
 $fields = $this->bloxconfig['fields'];
-
 $start = $pageStart-1;
 $table = $modx->getFullTablename($this->bloxconfig['tablename']);
 
@@ -53,6 +52,13 @@ $p = new Pagination( array ('per_page'=>$perPage,
 'cur_item'=>$this->bloxconfig['pageStart'],
 'total_rows'=>$numRows));
 
+$fieldnames = array();
+if (count($this->columnNames)>0){
+	foreach ($this->columnNames as $col){
+		$col=array('fieldname'=>$col);
+	    $fieldnames[]=$col;	
+	}
+} 
 $bloxdatas['innerrows']['fieldnames']=$fieldnames;
 /*
 print_r($bloxdatas);

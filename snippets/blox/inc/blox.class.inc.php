@@ -213,6 +213,7 @@ class blox {
             $this->xcc_button['xtools'] = '<div style="opacity: 0; visibility: hidden; width:85px;" class="xtools">
                                                <span class="drag">drag</span>
                                                </div>';
+ 		    $this->xcc_button['xtools'] = '';
             $this->xcc_button['bottom'] = '</div>';
 			//
             $this->containerclassnames['containerclass'] = 'xcc_container';
@@ -568,14 +569,16 @@ class blox {
         }
         if ($row['makexccbutton'] == '1')
         {
-        
-            $output = '
-                	<div class="xcc_button">
-                	'.$row[$this->bloxconfig['captionField']].'
+            /*
+			$dragtools='
                     <div style="opacity: 0; visibility: hidden; width:85px;" class="xtools">
                         <span class="drag">drag</span>
                     </div>
-                	'.$output.'
+                	';
+            */    	
+            $output = '
+                	<div class="xcc_button">
+                	'.$row[$this->bloxconfig['captionField']].$dragtools.$output.'
                 	</div>
                 	';
             //$this->xcc_button['caption'] = '[+'.$this->bloxconfig['captionField'].'+]';
@@ -955,8 +958,12 @@ class blox {
 
     function filter2sqlwhere($filters, $TVarray=array(), $resourceclass='modDocument') {
 
-    //$filters = 'pagetitle|der Titel|=++parent|25,30,40|IN++(rennennr|10|>||(published|1|=++deleted|0|=)++id|1,2,3,4,5|IN)||parent|25|=';
+    //$filter = 'pagetitle|der Titel|=++parent|25,30,40|IN++(rennennr|10|>||(published|1|=++deleted|0|=)++id|1,2,3,4,5|IN)||parent|25|=';
     //$where = '`pagetitle`="der Titel" AND `parent` IN (25,30,40) AND (`rennennr` > 10 OR `published` = 1 AND `deleted` = 0) OR `id` IN (1,2,3,4,5))';
+    //Todo??:
+	//title,body|database|MATCH
+	//SELECT * FROM articles WHERE MATCH (title,body) AGAINST ('database');
+	//use $filter='title|%database%|like||pagetitle|%database%|like';
 
     // das Suchmuster mit Delimiter und Modifer (falls vorhanden)
         $pattern = '#(\|\|)|(\+\+)#';
@@ -1000,14 +1007,21 @@ class blox {
                         if (count($pieces) == 3) {
                             $o_enc = '"';
                             $c_enc = '"';
-                            switch($pieces[2]) {
+                            switch($pieces[2])
+                            {
                                 case 'IN':
                                     $o_enc = '(';
                                     $c_enc = ')';
                                     break;
                                 case 'eq':
-                                    $pieces[2]='=';
-                                    break;									
+                                    $pieces[2] = '=';
+                                    break;
+                                case 'gt':
+                                    $pieces[2] = '>=';
+                                    break;
+                                case 'lt':
+                                    $pieces[2] = '<=';
+                                    break;
                                 default:
                                     break;
                             }

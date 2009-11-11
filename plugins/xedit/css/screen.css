@@ -121,7 +121,7 @@ a#showControls{
 	
 .blox .xtools {
 	position: absolute;
-	top: 0;
+	top: -12px;
 	right: 0px;
 	width: 100px;
 }
@@ -139,33 +139,21 @@ a#showControls{
 .xtools span.save{
 	background: url(images/icons_09.png) top left no-repeat;
 	cursor: pointer;
-	position: absolute; 
-	top: -12px;
-	right: 23px;
 	}
 	
 .xtools span.xtrash{
 	background: url(images/icons_11.png) top left no-repeat;
 	cursor: crosshair;
-	position: absolute; 
-	top: -12px;
-	right: 51px;
 	}
 
 .xtools span.drag{
 	background: url(images/icons_07.png) top left  no-repeat;
 	cursor: move;
-	position: absolute; 
-	top: -12px;
-	right: -5px;
 	}
 
 .xtools span.remove{
 	background: url(images/CC_icon_cancel.png) no-repeat left top;
 	cursor: crosshair;
-	position: absolute; 
-	top: -12px;
-	right: 79px;
 	}
 
 
@@ -229,6 +217,12 @@ ol, ol li {
 
 div.blox.published_0 {
 	 border: 1px solid red !important;
+}
+
+.sortmode_on .blox{
+	height:60px;
+	overflow-x:hidden;
+	cursor: move;
 }
 
 .menuindex {

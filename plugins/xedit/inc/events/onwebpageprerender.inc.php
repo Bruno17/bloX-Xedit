@@ -52,7 +52,7 @@ $filemanager='
     $head =<<<EOD
 
 <!-- Start Xedit headers -->
-	<link href="{$site_url}assets/plugins/xedit/css/mooinline.css" rel="stylesheet" media="screen" type="text/css" />
+	<link href="{$site_url}assets/plugins/xedit/js/moorte/js/mooRTE/moorte.css" rel="stylesheet" media="screen" type="text/css" />
 	<link href="{$site_url}assets/plugins/xedit/css/xcc.css" rel="stylesheet" media="screen" type="text/css" />
         <link href="{$site_url}assets/plugins/xedit/css/sexyalertbox.css" rel="stylesheet" media="screen" type="text/css" />		
         <link href="{$site_url}assets/plugins/xedit/css/screen.css" rel="stylesheet" media="screen" type="text/css" />		
@@ -60,7 +60,7 @@ $filemanager='
 	    {$mootools}
 		{$filemanager}
 	<script src="{$site_url}assets/plugins/xedit/js/blox_sortables.js" type="text/javascript"></script>
-	<script src="{$site_url}assets/plugins/xedit/js/mooinline.js" type="text/javascript"></script>
+	<script src="{$site_url}assets/plugins/xedit/js/moorte/js/mooRTE/moorte.js" type="text/javascript"></script>
 	<script src="{$site_url}assets/plugins/xedit/js/editx_bruno.js" type="text/javascript"></script>		
         <script src="{$site_url}assets/plugins/xedit/js/tabs.js" type="text/javascript"></script>
         <script src="{$site_url}assets/plugins/xedit/js/groar.js" type="text/javascript"></script>
@@ -78,11 +78,8 @@ window.addEvent('domready', function(){
 	
 mySortables = new blox_Sortables();
 
-mte = new MooInline('.xedit', {
-                    defaults: ['bold,italic,underline,justifyleft,justifycenter,justifycenter,insertorderedlist,insertunorderedlist'],
-                    location: 'pageTop',
-                    floating: true
-                });	 
+mte = new MooRTE({elements:'.xedit',location:'pagetop'});
+
                          
 brunoclass = new Mif.brunoclass();
 xtoolsStart = new Mif.xtools();

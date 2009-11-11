@@ -361,6 +361,20 @@ div.xcc_formelement input:focus{
 	background: url(images/CC_icon_save.png) top left no-repeat;
 	cursor: pointer;
 }
+#sorttoggler {
+	display: block;
+	width: 34px;
+	height: 34px;
+	position: absolute;
+	right: 55px;
+	top: 12px;
+	background: url(images/CC_icon_sort_on.png) top left  no-repeat;
+	cursor: pointer;
+}
+
+#sorttoggler.sortmode_off {
+	background: url(images/CC_icon_sort_off.png) top left  no-repeat;
+}
 
 #xcc_edit_cancel{
 	display: block;

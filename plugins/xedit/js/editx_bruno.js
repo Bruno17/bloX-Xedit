@@ -7,7 +7,7 @@ Mif.Tree
  * @author marc
  */
 
-var runfilemanager = function(el){
+		var runfilemanager = function(el){
 			/* Filemanager - Simple Example */
 			var elid=el.get('id');
 			var fieldtype=el.get('fieldtype');
@@ -56,27 +56,19 @@ var runfilemanager = function(el){
 			/* End Filemanager Examples */				
 }
 
-            var startXtools = function(){
-                //console.log(doc_id);
-				//var ajax_url=ajax_url;
-				//Slimbox.scanPage();
-	
-				
+var togglesortables = function(){
 				var unremoveables = $$('.unremoveable');
 				var unfillables = $$('.fillable_0 , .xcc_bloxcontainer');
-				var containers = $$('.bloxcontainer , .xcc_bloxcontainer');
-             
-				var rte=$('rte');
-				if (rte) rte.destroy();
-				
-				mte.initialize('.xedit', {
-                    defaults: ['bold,italic,underline,justifyleft,justifycenter,justifycenter,insertorderedlist,insertunorderedlist'],
-                    location: 'pageTop',
-                    floating: true
-                });	                
-              
-                // ... bis hier baut das Snippet den JS-Teil zusammen und pflanzt ihn in die Seite. 
-                xtoolsStart.initialize();
+				var containers = $$('.bloxcontainer , .xcc_bloxcontainer');	
+				var sorttoggler = $('sorttoggler');
+				if (sorttoggler.retrieve('sortmode')=='on'){
+					//mySortables.removeItems(containers);
+					mySortables.detach();
+					sorttoggler.store('sortmode','off');
+					$$('.bloxcontainer').removeClass('sortmode_on');
+					sorttoggler.removeClass('sortmode_off');	
+				}
+				else{
                 mySortables.initialize(containers, {
                     // die Container müssen noch durch das Snippet belegt werden. Denke da an regClientScript oder wie das heißt.
                     // Die anderen Optionen kommen ja auch vom Snippet. Also von hier ....
@@ -88,7 +80,7 @@ var runfilemanager = function(el){
                     clone: true,
                     constrain: false,
                     opacity: .5,
-                    handle: 'span.drag',
+                    //handle: 'span.drag',
                     onStart: function(el){
                         //passes element you are dragging
                         el.highlight('#F3F865');
@@ -105,7 +97,36 @@ var runfilemanager = function(el){
                         duration: 1000,
                         transition: Fx.Transitions.Elastic.easeOut
                     }
-                });
+                });	
+				sorttoggler.store('sortmode','on');	
+				$$('.bloxcontainer').addClass('sortmode_on');
+				sorttoggler.addClass('sortmode_off');						
+				}
+				
+
+				
+}
+
+
+            var startXtools = function(){
+                //console.log(doc_id);
+				//var ajax_url=ajax_url;
+				//Slimbox.scanPage();
+	
+				var unremoveables = $$('.unremoveable');
+				var unfillables = $$('.fillable_0 , .xcc_bloxcontainer');
+				var containers = $$('.bloxcontainer , .xcc_bloxcontainer');
+             
+			    
+				var rte=$('.rteRemove');
+				if (rte) rte.destroy();
+				
+				mte.initialize({elements:'.xedit',location:'pagetop'});
+                                
+              
+                // ... bis hier baut das Snippet den JS-Teil zusammen und pflanzt ihn in die Seite. 
+                xtoolsStart.initialize();
+
                 
                 // var multichunkStart = new multichunks();	
                 
@@ -143,18 +164,22 @@ var runfilemanager = function(el){
 					button.addEvent('click', function(){
                         var blox = button.getElement('.blox');
                         var multinew = blox.clone();
-                        var destination =$(button.getParent().get('container'));
+						var parent = $(button.getParent());
+                        var destination = parent.get('container');
+						var inject_pos = parent.get('inject_pos')||'top';
 						if (destination){
-							multinew.inject(destination, 'top');
+							multinew.inject(destination, inject_pos);
 						}
 						else{
 							if (document.getElement('.fillable_1')){
-								multinew.inject(document.getElement('.fillable_1'), 'top');
+								multinew.inject(document.getElement('.fillable_1'), inject_pos);
 							}
 						}
+                       
+                        if ($('sorttoggler').retrieve('sortmode') == 'on') {
+                            mySortables.addItems(multinew);
+                        }
 						
-                        
-						mySortables.addItems(multinew);
 						
                         var myFx = new Fx.Scroll(window, {
                             offset: {
@@ -190,15 +215,22 @@ var runfilemanager = function(el){
 				$('saveall').removeEvents('click');
                 $('saveall').addEvent('click', function(e){
 				 new Event(e).stop();	
-                 brunoclass.saveall('all')
+                 brunoclass.saveall('all');
 				 
                  }
 				);
+				$('sorttoggler').removeEvents('click');
+                $('sorttoggler').addEvent('click', function(e){
+				 new Event(e).stop();	
+                 togglesortables();
+				 
+                 }
+				);				
                 // nur Blox-Editarea speichern
 				$('xcc_edit_save').removeEvents('click');
                 $('xcc_edit_save').addEvent('click', function(e){
 				 new Event(e).stop();	
-                 brunoclass.saveall('xcc_edit')
+                 brunoclass.saveall('xcc_edit');
 				 
                  }
 				);				
@@ -950,7 +982,7 @@ Mif.xtools = new Class({
         duration: '1000',
         trash_class: '.xtrash',
         save_class: '.save',
-        drag_class: 'span.drag',
+        //drag_class: 'span.drag',
         sort_class: '.blox',
         remove_class: '.remove',
         tools_class: '.xtools'

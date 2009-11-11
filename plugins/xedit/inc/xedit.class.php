@@ -802,44 +802,64 @@ where sc.id=$docid and c.category='$containerTvs'
         $pageinfo = $modx->getPageInfo($docid, 0, 'published');
 		$published = $pageinfo['published'];
         
-        switch($type) {
+        switch($type)
+        {
             case 'settingTabs':
-                $btc = new blox_Template_Collection(array ($template), $this);
-                $settings=$btc->settings[$template]['setting_tabs'];
+                $btc = new blox_Template_Collection( array ($template), $this);
+                $settings = $btc->settings[$template]['setting_tabs'];
                 //$attributes = 'class="docinput"';
-				$classnames = array('docinput');
+                $classnames = array ('docinput');
                 $c_type = 'container';
                 /*for revo
-                $template = $modx->getObject('modTemplate', array ('id'=>$template), true);
-                $settings = $template->getProperties('setting_tabs');
-                $settings = $settings['setting_tabs'];			
-                */
+                 $template = $modx->getObject('modTemplate', array ('id'=>$template), true);
+                 $settings = $template->getProperties('setting_tabs');
+                 $settings = $settings['setting_tabs'];
+                 */
                 break;
             case 'tvTabs':
-                $btc = new blox_Template_Collection(array ($template), $this);
-                $settings=$btc->settings[$template]['tv_tabs'];
+        
+                if ( isset ($this->tv_tabs[$template]))
+                {
+                    $tv_tabs = explode(':', $this->tv_tabs[$template]);
+					$settings = $this->tv_tabs[$template];
+                    if ($tv_tabs[0] == '@TV')
+                    {
+                        $tv = $modx->getTemplateVarOutput($tv_tabs[1]);
+                        $settings = $tv[$tv_tabs[1]];
+                    }        
+                }
+                else
+                {
+                    $btc = new blox_Template_Collection( array ($template), $this);
+                    $settings = $btc->settings[$template]['tv_tabs'];
+                }
+        
                 //$attributes = 'class="docinput"';
-				$classnames = array('docinput');
+                $classnames = array ('docinput');
                 $c_type = 'container';
-                break;
+            break;
             default:
-			
-                if (isset($_POST['xedit_tabs'])&& !empty($_POST['xedit_tabs']) && isset ($_POST['containers'])) {
+        
+                if ( isset ($_POST['xedit_tabs']) && ! empty($_POST['xedit_tabs']) && isset ($_POST['containers']))
+                {
                     $containers = (array)json_decode(($_POST['containers']), true);
-                    $xedit_tabs = explode(':',$_POST['xedit_tabs']);
-                    if ($xedit_tabs[0]=='@TV') {
-                    	
-                        $tv = $modx->getTemplateVarOutput($xedit_tabs[1],$containers[0]['sender_id']);
+                    $xedit_tabs = explode(':', $_POST['xedit_tabs']);
+                    if ($xedit_tabs[0] == '@TV')
+                    {
+        
+                        $tv = $modx->getTemplateVarOutput($xedit_tabs[1], $containers[0]['sender_id']);
                         $settings = $tv[$xedit_tabs[1]];
                     }
-                    if ($xedit_tabs[0]=='@CONFIG') {
-                        $settings = $this->container['params']['xeditTabs'][$_POST['chunkname']]; 
-                    }					
+                    if ($xedit_tabs[0] == '@CONFIG')
+                    {
+                        $settings = $this->container['params']['xeditTabs'][$_POST['chunkname']];
+                    }
                 }
-                else {
+                else
+                {
                     $chunknames = array ($template);
                     $bcc = new blox_Chunk_Collection($chunknames, $this);
-                    $settings=$bcc->settings[$template]['xedit_tabs'];
+                    $settings = $bcc->settings[$template]['xedit_tabs'];
                 }
 
 
@@ -1115,7 +1135,7 @@ where sc.id=$docid and c.category='$containerTvs'
     //////////////////////////////////////
 	global $modx;
 	
-    if ($this->userPermissions['cancreatedocs'] == '1')
+    if ($this->userPermissions['runxedit'] == '1')
     {
     
         $GLOBALS['xedit_runs'] = '1';
@@ -1304,6 +1324,7 @@ where sc.id=$docid and c.category='$containerTvs'
 		<div id="xcc">
 			<span id="minimize" class="maximize">&nbsp;</span>
 			<span id="saveall">&nbsp;</span>
+			<span id="sorttoggler">&nbsp;</span>
 			<div id="xcc_panel" class="clearfix">
 			'.$bloxTab.$settingTab.$tvTab.'
 				<div class="xcc_level1 xcc_area_blox_edit xcc_level1_inactive">
@@ -1620,11 +1641,11 @@ return $body_top;
     }
 
     function prepareXccButton($button_caption, $published, $chunkname, $drag_content, $btn_docid='new', $btn_savemode='') {
-        $output .= '
+        //$dragtool='<div class="xtools"><span class="drag">drag</span></div>';
+		$output .= '
 		<li class="xcc_button">
-		'.$button_caption.'
-		<div class="xtools"><span class="drag">drag</span></div>
-        <div class="bildchunk blox clearfix dragelement" resourceclass="modDocument" rowid="'.$btn_docid.'" chunkname="'.$chunkname.'" published="'.$published.'" savemode="'.$btn_savemode.'">
+		'.$button_caption.$dragtool.'
+		<div class="bildchunk blox clearfix dragelement" resourceclass="modDocument" rowid="'.$btn_docid.'" chunkname="'.$chunkname.'" published="'.$published.'" savemode="'.$btn_savemode.'">
         <div class="xtools"><span class="drag">drag</span><span class="xtrash">trash</span><span class="save">save</span><span class="remove">remove</span></div>
         <div class="edit">
         '.$drag_content.'
