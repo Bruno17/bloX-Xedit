@@ -3,7 +3,6 @@
 $basePath = $modx->config['base_path'];
 
 
-
 /*
  * Todos:
  * rowTpl - 

@@ -349,6 +349,11 @@ class blox {
         $bloxouterTplData = array ();
         $bloxinnerrows = array ();
 		$bloxinnercounts = array ();
+
+        if ($GLOBALS['xedit_runs'] == '1'){
+        	$outerdata['innerrows']['bloxdummy'][]=array('caption'=>'Dummy');	
+        }
+
         $innerrows = $outerdata['innerrows'];
 
         if (count($innerrows) > 0) {

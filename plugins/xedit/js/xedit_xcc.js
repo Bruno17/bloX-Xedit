@@ -18,7 +18,7 @@
 		});	
 		
 		//Bruno - das anders lösen(alle brunoclass-funktionen in die Klasse xcc packen???)
-        var brunoclass = new Mif.brunoclass();
+        var brunoclass = new Xedit.brunoclass();
 													
 		var xcc_start = new xcc({
             brunoclass: brunoclass

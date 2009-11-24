@@ -1,8 +1,4 @@
-/*
-Mif.Tree
 
-//Mif noch umbenennen
-*/
 /**
  * @author marc
  */
@@ -116,6 +112,7 @@ var togglesortables = function(){
 				var unremoveables = $$('.unremoveable');
 				var unfillables = $$('.fillable_0 , .xcc_bloxcontainer');
 				var containers = $$('.bloxcontainer , .xcc_bloxcontainer');
+				mySortables.checkChildCounts(containers);
              
 			    
 				var rte=$('.rteRemove');
@@ -241,9 +238,9 @@ var togglesortables = function(){
 
 
 
-if(!Mif) var Mif={};
+if(!Xedit) var Xedit={};
 
-Mif.brunoclass = new Class({
+Xedit.brunoclass = new Class({
 
     Implements: [new Options],
     
@@ -975,7 +972,7 @@ Mif.brunoclass = new Class({
 });
 
 
-Mif.xtools = new Class({
+Xedit.xtools = new Class({
     Implements: [new Options],
     
     options: {

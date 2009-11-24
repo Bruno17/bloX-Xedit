@@ -81,8 +81,8 @@ mySortables = new blox_Sortables();
 mte = new MooRTE({elements:'.xedit',location:'pagetop'});
 
                          
-brunoclass = new Mif.brunoclass();
-xtoolsStart = new Mif.xtools();
+brunoclass = new Xedit.brunoclass();
+xtoolsStart = new Xedit.xtools();
 startXtools();
 startxcc();
 });
