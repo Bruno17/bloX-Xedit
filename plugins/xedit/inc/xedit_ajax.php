@@ -4,22 +4,8 @@
  * $Id$
  */
 
-
 include $pluginpath.'/config.php';
 include $pluginpath.'/boot.php';
-
-//hier mal hardcoded ne Konfiguration für TV-tabs
-//die soll er sich dann aus der config für das jeweilige chunk holen
-//wo auch immer die mal gespeichert wird
-//wird jetzt in der settings-tabelle gespeichert bzw. in der config.php
-/*   	
- $xedit_tabs['content']['caption']='Content';
- $xedit_tabs['content']['tv_names']='content';
- $xedit_tabs['text']['caption']='Text';
- $xedit_tabs['text']['tv_names']='text';
- $xedit_tabs['sonstige']['caption']='Sonstige Tvs';
- $xedit_tabs['sonstige']['tv_names']='pagetitle,chunkname,checkbox,bild';
- */
 
 if ( isset ($XCC))
 {
@@ -30,15 +16,12 @@ if ( isset ($XCC))
     return;
 }
 
-
-
-
 if ( isset ($_REQUEST['directory']))
 {
-$modx->logEvent('29','3',serialize($_POST),'Fancy Upload Post');
-$modx->logEvent('29','3',serialize($_GET),'Fancy Upload Get');
-include $pluginpath.'inc/FileManager/filemanager.php';
-$savemassage='';
+    //$modx->logEvent('29','3',serialize($_POST),'Fancy Upload Post');
+    //$modx->logEvent('29','3',serialize($_GET),'Fancy Upload Get');
+    include $pluginpath.'inc/FileManager/filemanager.php';
+    $savemassage = '';
 }
 
 
@@ -46,7 +29,6 @@ if ( isset ($_POST['save_tv_tabs']))
 {
 
     $last_docid = $xedit->saveFrontEndTvTabs();
-
     $savemassage = '<div id="response_rowid">'.$last_docid.'</div>';
     //print_r($savemassage);
 }
@@ -64,8 +46,6 @@ if ( isset ($_POST['editx']))
 if ( isset ($_POST['reload']) && $_POST['reload'] == 'wrapper')
 {
 
-
-
     $docid = $_POST['docid'];
 
     if ($modx->documentIdentifier != $docid)
@@ -73,8 +53,6 @@ if ( isset ($_POST['reload']) && $_POST['reload'] == 'wrapper')
         //$modx->sendForward($docid);
         $modx->sendRedirect($_POST['docurl']);
     }
-
-
 }
 
 

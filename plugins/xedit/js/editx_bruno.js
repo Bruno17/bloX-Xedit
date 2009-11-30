@@ -21,11 +21,12 @@
 				directory: startDir,
 				baseURL: baseURL,
 				fieldtype: fieldtype,
+				bloxProps: brunoclass.getEditingProps(),
 				language: 'de',
 				selectable:true,
 				uploadAuthData: {session: sessionId},
 				onComplete: function(path, file){
-				el.set('value', baseURL+path);
+				el.set('value', this.options.baseURL+path);
 				}
 			});
 			manager1.show();
@@ -485,22 +486,12 @@ Xedit.brunoclass = new Class({
     
     
     },
-
-    sendBloxForm: function(form,mode){
-    
-        //Empty the log and show the spinning indicator.
-        //var log = $('message').addClass('ajax-loading');
+	getEditingProps: function(){
         var editingElement = this.editingElement;
-        //var rowid=this.editingElement.get('rowid');
-        //var samedocids = $(document.body).getElements('.blox[rowid='+rowid+']');
-        
-        //Set the options of the form's Request handler. 
-        //("this" refers to the $('myForm') element).
         var container = editingElement.getParent();
 		var c_props = container.retrieve('c_props');
 		var chunk_props = editingElement.retrieve('properties');
         //chunk_props.set('modified','yes');
- 
         var resourceClass = editingElement.get('resourceclass') || 'modDocument';
         var tablename = editingElement.get('tablename') || '';
 		var rowid = editingElement.get('rowid') || 'new';
@@ -509,13 +500,19 @@ Xedit.brunoclass = new Class({
 		coll_inputs = $merge(chunk_props,{'modified':'yes'}, {fields: coll_inputs});
 		coll_inputs = $merge(c_props, {chunks: [coll_inputs]});
 		coll_inputs = JSON.encode([coll_inputs]);
-        var input = new Element('input', {
+	    return coll_inputs;
+	},
+
+    sendBloxForm: function(form,mode){
+    
+        var coll_inputs = this.getEditingProps();
+		var input = new Element('input', {
             id: 'coll_container',
             'type': 'hidden',
             'name': 'coll_container',
             'value': coll_inputs
         });
-        input.inject($('ajax'), 'top');
+        input.inject($('ajax'), 'top');	
         form.set('send', {
             method: 'post',
             onComplete: function(response){
@@ -902,14 +899,36 @@ Xedit.brunoclass = new Class({
                 //date-picker               
                 if (el.hasClass('fdp')) {
                     var dpid = el.get('id');
-					var opts ={
-                        formElements: JSON.decode('{"'+dpid+'":"d-dt-m-dt-y"}'),
-						rangeLow:el.get('rangelow'),
-						rangeHigh:el.get('rangehigh')
-                    };
+					var range_low = el.get('rangelow');
+					var range_high = el.get('rangehigh');
+					var inputOutputFormat = 'd.m.Y';
+					var rangeformat = 'd-m-Y';
+                    var picker = new DatePicker('#'+dpid, { 
+					positionOffset: { x: 150, y: -150 },
+					inputOutputFormat: inputOutputFormat,
+					minDate: { date: range_low, format: rangeformat },
+					maxDate: { date: range_high, format: rangeformat },
+					onSelect: function(d){
+						var endpicker = el.get('endpicker');
+						if (endpicker){
+							var clone = $(endpicker+'_clone');
+							endpicker = $(endpicker);
+							var low = endpicker.get('rangelow');
+							if (d > picker.unformat(low,rangeformat)){
+							endpicker.set('value',picker.format(d,inputOutputFormat));
+							clone.set('value',picker.format(d,picker.options.format));								
+							}
+							endpicker.set('rangelow',picker.format(d,rangeformat));
 
-                    datePickerController.destroyDatePicker(dpid);
-                    datePickerController.createDatePicker(opts);
+						}
+						
+						
+					}
+
+                    });
+                    
+                    //datePickerController.destroyDatePicker(dpid);
+                    //datePickerController.createDatePicker(opts);
    
                     
                 }	

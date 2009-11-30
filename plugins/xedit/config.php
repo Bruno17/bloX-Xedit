@@ -36,7 +36,6 @@ $params['xeditTabs']['reservation']='Reservation bearbeiten:@CHUNK:reservation';
 $params['onbeforesave']['reservation']='@CHUNK:reservation';
 
 
-
 //hier könnten noch irgendwelche Grundeinstellungen für die chunk_SettingFields rein
 $params['chunk_SettingFields']='blox_template:text,ditto_hiddenfields:text,xedit_tabs:textarea';
 $params['template_SettingFields']='blox_settings:textarea,setting_tabs:textarea,tv_tabs:textarea,xedit_tabs:textarea';
@@ -78,7 +77,6 @@ $params['filemanager']['file_path_user']='userfolders/@USERID/files/';
 $permissions_mgr['admins']='runxedit,caneditalldocs,cancreatedocs,canseeunpublisheddocs';
 $permissions_web['admins']='runxedit,caneditalldocs,cancreatedocs';
 //$permissions_web['moderatoren']='canseeunpublisheddocs';
-
 
 $tables['mtc'] = $modx->getFullTablename('site_multiTVchunks');
 $tables['hts']  = $modx->getFullTablename('site_htmlsnippets');

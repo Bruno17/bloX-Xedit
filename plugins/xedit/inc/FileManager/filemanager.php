@@ -9,12 +9,24 @@ function UploadIsAuthenticated($get){
 	return false;
 }
 
+$fieldtype=(isset($_REQUEST['fieldtype']))?$_REQUEST['fieldtype']:'';
+$bloxProps=(isset($_REQUEST['bloxProps']))?$_REQUEST['bloxProps']:'';
+
+$directory = $xedit->makeFileManagerPath($fieldtype,$bloxProps);
+
+$parts=explode('/',$directory);
+unset($parts[count($parts)-1]);
+$url=implode('/',$parts).'/';
+
 $browser = new FileManager(array(
-	'directory' => $basePath.'assets/galleries/',
+	'directory' => $basePath.'assets/'.$directory,
 	'assetBasePath' => $basePath.'assets/plugins/xedit/inc/FileManager/Assets',
-	'baseURL' => 'http://bruno.tattoocms.de/assets/',
+	'domain' => 'http://bruno.tattoocms.de/',
+	'baseURL' => 'assets/'.$url,
 	'upload' => true,
 	'destroy' => true
 ));
 
-$browser->fireEvent(!empty($_POST['event']) ? $_POST['event'] : null);
+$modx->logEvent(0, 1, print_r($_REQUEST,true) , 'filemanager');
+
+$browser->fireEvent(!empty($_REQUEST['event']) ? $_REQUEST['event'] : null);

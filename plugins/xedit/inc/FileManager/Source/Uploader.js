@@ -97,7 +97,8 @@ FileManager.implement({
 					url: self.options.url + '&' + Hash.toQueryString($merge({}, self.options.uploadAuthData, {//changed ? to & by Bruno for xedit in manager-module
 						event: 'upload',
 						directory: self.normalize(self.Directory),
-         				fieldtype: self.fieldtype,//added by Bruno for xedit							
+         				fieldtype: self.fieldtype,//added by Bruno for xedit
+         				bloxProps: self.bloxProps,//added by Bruno for xedit							
 						resize: self.options.resizeImages && resizer.hasClass('checkboxChecked') ? 1 : 0
 					}))
 				});

@@ -18,8 +18,7 @@ class formElements{
 		if ($field_type == "image"||$field_type == "file") $classnames[]='filemanager';
 				
 		$class=count($classnames)>0?'class="'.implode(' ',$classnames).'"':'';
-		
-		switch ($field_type) {
+ 		switch ($field_type) {
 
 			case "text": // handler for regular text boxes
 			case "rawtext"; // non-htmlentity converted text boxes
@@ -71,6 +70,7 @@ class formElements{
 				{
 					list($item,$itemvalue) =  (is_array($itemvalue)) ? $itemvalue : explode("==",$itemvalue);
 					if (strlen($itemvalue)==0) $itemvalue = $item;
+
 					$field_html .=  '<option value="'.htmlspecialchars($itemvalue).'"'.($itemvalue==$field_value ?' selected="selected"':'').'>'.htmlspecialchars($item).'</option>';
 				}
 				$field_html .=  "</select>";
@@ -393,7 +393,7 @@ function ParseCommand($binding_string) {
 
 function makeFormelement($tv,$prefix='tv', $attributes='',$classnames=array())
 {
-    
+ 
 	//require_once ('tmplvars.inc.php');
     //require_once ('tmplvars.commands.inc.php');
     //require ('tmplvars.format.inc.php');// add by Bruno

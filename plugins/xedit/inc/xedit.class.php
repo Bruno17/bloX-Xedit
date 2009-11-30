@@ -292,6 +292,7 @@ function setSetting($chunkname,$settingname,$settingvalue){
         return $allChunkFieldNames;
     }
 
+    /*
     function setChunkContentsPH($block) {
         global $modx;
         $tvIds = array_flip($this->allChunkTvNames);
@@ -308,7 +309,7 @@ function setSetting($chunkname,$settingname,$settingvalue){
         $modx->setPlaceholder('chunkcontents',$chunkcontents);
         return;
     }
-
+    */
 
     function prepareChunkForXedit($chunk_content,$block='',$setDefault='0',$forChunkSelecion='0') {
 
@@ -573,7 +574,10 @@ class xedit {
         return $ajax_urls;
     }
 
-    function makeFileManagerPath($fieldtype){
+    function makeFileManagerPath($fieldtype,$bloxProps){
+
+global $modx;
+    	
  
 //default
 $params['filemanager']['image_path']='images/';
@@ -591,10 +595,40 @@ $params['filemanager']['file_path_FIELD']='filespath';//used if not empty
 //you can also use @USERID in all of above configs as part of path
 $params['filemanager']['image_path_user']='userfolders/@USERID/images/';
 $params['filemanager']['file_path_user']='userfolders/@USERID/files/'; 
- 
- 
-        $path=$this->container['params']['filemanager'][$fieldtype.'_path'];
-    	
+
+//default:
+$path=$this->container['params']['filemanager'][$fieldtype.'_path']; 
+
+
+if ($bloxProps !== ''){
+
+$bloxProps = (array)json_decode($bloxProps, true);
+$docid = $bloxProps[0]['sender_id'];
+$rowid = $bloxProps[0]['chunks'][0]['rowid'];
+$tablename = $bloxProps[0]['chunks'][0]['tablename'];
+//check, if to use path from page-tv:
+$pathFIELD=$this->container['params']['filemanager'][$fieldtype.'_path_TV']; 
+$tv=$modx->getTemplateVarOutput($pathFIELD,$docid);
+$FIELDpath=trim($tv[$pathFIELD]);
+if (!empty($FIELDpath)){
+	if (substr($FIELDpath,0,7)=='assets/'){
+		$path=substr_replace($FIELDpath,'',0,7);
+	}
+}
+
+//check, if to use path per row:
+$pathFIELD=$this->container['params']['filemanager'][$fieldtype.'_path_FIELD']; 
+$tv=$modx->getTemplateVarOutput($pathFIELD,$rowid);
+$FIELDpath=trim($tv[$pathFIELD]);
+if (!empty($FIELDpath)){
+	if (substr($FIELDpath,0,7)=='assets/'){
+		$path=substr_replace($FIELDpath,'',0,7);
+	}
+}	
+	
+}
+        
+    	//$path='images/4';
 		return $path;
     	
     }
@@ -916,6 +950,7 @@ where sc.id=$docid and c.category='$containerTvs'
 		     */                        
 		
                         $tabfields=$tab[1];
+						$mode='';
                         if (count($tab)==3) {
                             $tabfields=$tab[2];
                             if ($tab[1]=='hidden') {
@@ -1061,6 +1096,7 @@ where sc.id=$docid and c.category='$containerTvs'
             if ($tablename == '')
             {
                 $tvs = $modx->getTemplateVars($tvnames, "*", $docid, $published, $sort = "rank", $dir = "ASC");
+
 			}
 			else{
 				$keyfield='id';
@@ -1074,8 +1110,12 @@ where sc.id=$docid and c.category='$containerTvs'
 			}
         }
 
+
+
         if (is_array($tvs) && count($tvs) > 0) {
             foreach ($tvs as $key=>$tv) {
+
+            if (is_array($tv['value'])) continue;
 
             if (isset($fields[$tv['name']]['fTV_assigned'])){
             	$fields[$tv['name']]['value']=$tv['value'];
@@ -1090,7 +1130,7 @@ where sc.id=$docid and c.category='$containerTvs'
             //$tv['formname'] = $tvName.'_'.$containerkey.'_'.$chunkkey;
                 $tv['formname'] = $prefix.'_input_'.$tv['name'];
                 if (!isset($tv['caption']))$tv['caption'] = $tv['name'];
-                
+
                 $tv['FormElement'] = $fe->makeFormelement($tv,'tv', $attributes.' fieldname = "'.$tv['name'].'"',$classnames);
                 if ($mode=='hidden') {
                     $tvSection .= '
@@ -1503,69 +1543,6 @@ return $body_top;
 }
 */
 
-    function makeTvSection($chunk,$containerkey,$chunkkey,$bcc) {
-    //Todo: Richtexteditor einbinden für richtext-Tvs
-    //print_r($this->NewMultiTvs);
-        global $modx;
-        //print_r($chunk);
-
-        $chunkkey=$chunk['id'];
-
-        $tvSection='';
-        //$chunk_Tvnames = $this->getTvsFromChunk($chunk['snippet']);
-        //$this->getTvsFromChunk($chunk['snippet']);
-        $chunk_Tvnames = $bcc->collectedChunks[$chunk['chunkname']]['tvNames'];
-        //print_r($chunk_Tvnames);
-
-        $tvs=$modx->getTemplateVars($chunk_Tvnames, $fields= "*", $chunkkey, $published= 1, $sort= "rank", $dir= "ASC");
-
-        $tvvalues=array();
-        if (is_array($tvs)&&count($tvs)>0) {
-            foreach ($tvs as $tv) {
-                $tvvalues[$tv['name']]=$tv['value'];
-            }
-        }
-
-        unset($tvs);
-        //print_r($tvvalues);
-
-        //$chunk_Tvnames = $chunk['tvNames'];
-        //print_r($chunk_Tvnames);
-        if (count($chunk_Tvnames)>0) {
-            $tvSection.='<table cellspacing="0" cellpadding="3" border="0" width="96%" style="position: relative;">
-                            <tbody>';
-            foreach ($chunk_Tvnames as $tvid=>$tvName) {
-                $tv=$this->NewMultiTvs[$tvName];
-                if (isset($chunk['TVs'][$tvid])&&!empty($chunk['TVs'][$tvid]['content'])) {
-                    $tv['content']=$chunk['TVs'][$tvid]['content'];
-                }
-                $tv['content']=$tvvalues[$tvName];
-                $tv['mTVchunkid']=$chunk['id'];
-                $tv['formname']='_'.$containerkey.'_'.$chunkkey.'_'.$tvName;
-                $tv['FormElement']=$this->makeFormelement($tv);
-                $tvSection.='
-                <tr><td colspan="2"><div class="split"/></td></tr>              
-		        <tr style="height: 24px;">
-                <td align="left" width="150" valign="top">
-                    <span class="warning">'.$tv['caption'].'</span><br/><span class="comment">'.$tv['description'].'</span>
-                </td>
-                <td valign="top" style="position: relative;">
-                '.$tv['FormElement'].'
-				</td>
-              </tr>				
-				'; 
-
-            }
-            //$_SESSION['containerTVs'][$containerkey][$chunkkey]=$chunk_Tvnames;
-            $tvSection.='</tbody></table>';
-        }
-        else {
-            $tvSection.= $_lang['tmplvars_novars'];
-        } //end check to see if there are template variables to display
-        return $tvSection;
-    }
-
-
 
     function makeSettingsOutput($settingFields, $settings) {
 
@@ -1732,8 +1709,7 @@ return $body_top;
         return $newTvs;
     }
 
-
-
+/*
     function getchunknames($categories='') {
         global $modx;
         $tbl_cat=$modx->getFullTablename('categories');
@@ -1755,7 +1731,7 @@ join $tbl_cat c on c.id = hts.category ".$wherecategorie;
         }
         return $chunknames;
     }
-
+*/
     function make_select($selectname, $values = array (),  $selectedvalue = '',$classname='', $array_key=false, $addEmpty = '0') {
         $class=($classname !== '')?'class="'.$classname.'"':'';
         $select = ($array_key)
@@ -1774,8 +1750,6 @@ join $tbl_cat c on c.id = hts.category ".$wherecategorie;
         $select .= '</select>';
         return $select;
     }
-
-
 
     function getChildrenIds($docid) {
 
@@ -1879,81 +1853,8 @@ join $tbl_cat c on c.id = hts.category ".$wherecategorie;
         }
         return $containerID;			
 		}
-		
 
     }
-
-
-
-    function saveBackendTvs() {
-        global $modx;
-        $containers=array();
-        if (is_array($_POST['container_key']) && count($_POST['container_key']) > 0) {//print_r($_POST['container_key']);
-        //$tvIds = array_flip($_SESSION['allChunkTvNames']);
-        //$this->getNewMultiTvs($tvIds);
-        //$tmplvars=array();
-
-            foreach ($_POST['container_key'] as $containerkey) {//echo $containerkey;
-                $chunks=array();
-                if ($_POST['input_docid_'.$containerkey] && count($_POST['input_docid_'.$containerkey]) > 0) {
-                    foreach ($_POST['input_docid_'.$containerkey] as $key=>$contentid) {
-                    //echo $contentid;
-                    //das noch prüfen!!!!
-                        $chunkname=$_POST['input_chunkname_'.$containerkey][$key];
-
-                        $prefix='tv_'.$containerkey.'_'.$contentid.'_';
-                        $fields = $this->collectPostedDocFields($contentid,$prefix);
-                        $chunk=array();
-                        $chunk['docid']=$contentid;
-                        $chunk['chunkname']=$chunkname;
-                        $chunk['fields']=$fields;
-                        $chunks[]=$chunk;
-                    }
-                }
-                $container=array();
-                $container['c_type']='blox_container';
-                $container['containerid']=$containerkey;
-                $container['c_parentid']=$_POST['id'];
-                $container['chunks']=$chunks;
-                $containers[]=$container;
-            }
-
-            //print_r($containers);
-
-            $last_docid=$this->saveModifiedChunks($containers);
-
-            return;
-        //$this->saveTvs($tmplvars);
-
-        }
-/*
-		$contentid=$_POST['input_rowid'];
-		$chunkname=$_POST['input_chunkname'];
-		
-		$tvvalues=array();
-		$tvIds=array();
-		$fields=array();
-		$prefix='tv_input_';
-
-        $fields = $this->collectPostedDocFields($prefix);
-
-		$chunks=array();
-		$chunks[0]['rowid']=$contentid;
-		$chunks[0]['chunkname']=$chunkname;	
-		$chunks[0]['fields']=$fields;
-		
-		$containers=array();
-		$containers[0]['c_type']=$_POST['input_c_type'];
-		$containers[0]['containerid']=$_POST['input_c_id'];
-		$containers[0]['c_parentid']=$_POST['input_c_parentid'];
-		$containers[0]['chunks']=$chunks;		
-
-        $last_docid=$this->saveModifiedChunks($containers);
-*/
-
-        return;
-    }
-
 
 
 /*
@@ -2010,43 +1911,6 @@ join $tbl_cat c on c.id = hts.category ".$wherecategorie;
 
 
     }
-
-    function collectPostedDocFields($contentid,$prefix) {
-        if (count($this->docColumnNames) > 0) {
-            foreach ($this->docColumnNames as $tvName) {
-                if ( isset ($_POST[$prefix.$tvName])) {
-                    $field = array ();
-                    $field['value'] = $_POST[$prefix.$tvName];
-                    $field['rowid'] = $contentid;
-                    $field['fieldname'] = $tvName;
-                    $fields[] = $field;
-                }
-            }
-        }
-
-        if (count($this->tvnames) > 0) {
-            foreach ($this->tvnames as $tvid=>$tvName) {
-                if (isset($_POST[$prefix.$tvName])) {
-                    $tvIds[]=$tvid;
-                }
-            }
-            $this->getNewMultiTvs($tvIds);
-            if (count($tvIds)>0) {
-                foreach ($tvIds as $tvid) {
-                    $field=array();
-                    $tvName=$this->tvnames[$tvid];
-                    $tmplvar=$this->saveTv_prepare($tvName, $tvName, $contentid, $prefix);
-                    $field['value']= $tmplvar['value'];
-                    $field['rowid']= $contentid;
-                    $field['fieldname']= $tvName;
-                    $fields[]=$field;
-                }
-            }
-
-        }
-        return $fields;
-    }
-
 
 /*
  * saveModifiedChunks
@@ -2146,198 +2010,9 @@ join $tbl_cat c on c.id = hts.category ".$wherecategorie;
         return $db->last_docid;
     }
 
-    function saveModifiedChunksold($containers) {
-
-    //invoke saveevents  hier noch einbauen
-
-        global $modx;
-        $output='';
-
-        if (is_array($containers) && count($containers) > 0) {
-        //$chunkContainers=($_SESSION['chunkContainers']);
-
-        //Todo:je nach containertyp (blox_container/parent_container/container) unterschiedlich verfahren
-        //$modx->db-escape noch einbauen
-        //print_r($containers);
-
-            foreach ($containers as $container) {
-            //$containerID = $container['c_parentid'];
-            //vorläufig die docid hier holen
-            //$this->docid=$containerID;//später ins javascript liefern und von dort dem request mitgeben
-                $resort='1';
-                unset($documentsTv);
-                unset($sortids);
-                $orderByField='menuindex';
-                //hier noch (unsortable,unfillable) checken
-
-                if ($container['c_type'] == 'parent_container') {
-                //parent ist festgelegt
-                    $containerID = $container['c_parentid'];
-
-                }
-                if ($container['c_type'] == 'blox_container') {
-                //parent ist der bloXcontainer
-                    $containerID=$this->saveBloxContainer($container);
-
-                }
-                if ($container['c_type'] == 'container') {
-                //können verschiedene parents sein, also nicht containergebunden
-                //und nicht sortierbar
-                    unset($containerID);
-                    $resort='0';
-                    if (isset($container['documentsTv'])&&$container['documentsTv']!=='0') {
-                        $documentsTv=$container['documentsTv'];
-                        $sortids=array();
-                    }
-
-                }
-                if (isset($container['orderByField'])&&$container['orderByField']!=='0') {
-                    $orderByField=$container['orderByField'];
-                }
-
-                $chunks = $container['chunks'];
-                if (count($chunks > 0)) {
-                    $index=1;
-                    foreach ($chunks as $key=>$chunk) {
-                	/*
-					if (empty($chunk['docid'])){
-                		echo 'docid is empty';
-                	}
-					*/
-                        $GLOBALS['save_blox_key']=$key;
-                        if ($chunk['docid'] !== 'dummy') {
-                            $invokearray=array ('mode'=>'new');
-                            $invokemode='new';
-                            $GLOBALS['savedoc']=true;
-                            if ( isset ($chunk['docid']) && $chunk['docid'] !== 'new' && $chunk['savemode'] == 'copy' && ! isset ($documentsTv)) {
-                                $doc = new Document($chunk['docid']);
-                                if ($doc->isNew !== '1') {
-                                    $doc->Duplicate();
-                                }
-
-                            } else {
-                                $doc = new Document($chunk['docid'], 'id');//hier $chunk['docid']
-                                if ($chunk['docid'] !== 'new'&&$doc->isNew !== '1') {
-                                    $invokemode='upd';
-                                    $invokearray=array('mode'=>'upd', 'id'=>$chunk['docid']);
-                                }
-                            }
-                            //dont save new documents if docid isnot 'new'
-                            if ($doc->isNew == '1'&&$chunk['docid'] !== 'new') {
-                                $GLOBALS['savedoc']=false;
-                            }
-
-                            //in config einstellbar machen!!
-                            $modx->invokeEvent('OnBeforeDocFormSave',$invokearray);
-
-                            if (isset($containerID)) {
-                                $doc->Set('parent', $containerID);
-                            }
-
-                            //$doc->Set('pagetitle', $chunk['fields']['pagetitle']);
-                            if ($resort == '1') {
-
-                                if ($orderByField=$this->checkfieldtype($orderByField)) {
-                                    $doc->Set($orderByField, $index);
-                                }
-
-                            }
-
-                            if ($chunk['modified'] !== 'no') {
-                                if (isset($chunk['chunkname'])) {
-                                    $doc->Set('tvchunkname', $chunk['chunkname']);
-                                }
-
-                                //echo $chunk['savemode'];
-                                if ($chunk['docid'] == 'new') {
-                                    $doc->Set('template', $parentTemplate);//Todo:--------
-                                }
-                                if (isset($container['filterByField'])&&$container['filterByField']!=='0'&&isset($container['filterValue'])&&$container['filterValue']!=='0') {
-                                    if ($filterByField=$this->checkfieldtype($container['filterByField'])) {
-                                        $doc->Set($filterByField, $container['filterValue']);
-                                    }
-                                }
-                                if (count($chunk['fields'])>0) {
-                                    foreach ($chunk['fields'] as $field) {
-                                    //echo $field['tablename'];
-                                        if ( isset ($_POST[$field['postname']])) {
-                                            $field['value'] = $_POST[$field['postname']];
-                                        }
-                                        //convert images from directresize
-
-                                        $field['value']=$this->ConvertFromBackend($field['value']);
-                                        $field['value'] = $modx->db->escape($field['value']);
-
-                                        if ($fieldname=$this->checkfieldtype($field['fieldname'])) {
-                                            $doc->Set($fieldname, $field['value']);
-
-                                        }
-
-                                    }
-                                }
-
-                                if ( isset ($chunk['published']) && (($chunk['published'] == '1') || $chunk['published'] == '0')) {
-                                    $doc->Set('published', $chunk['published']);
-                                }
-                                if ( isset ($chunk['deleted']) && (($chunk['deleted'] == '1') || $chunk['deleted'] == '0')) {
-                                    $doc->Set('deleted', $chunk['deleted']);
-                                }
-
-                            }
-
-                            if (isset($documentsTv)&&$chunk['docid']=='new') {
-
-
-                            //dont save new documents in referenz-containers???
-                            //or define an folder where to save???
-                            }elseif($GLOBALS['savedoc']) {
-                                $doc->Save();
-
-                                $index++;
-                                $last_docid=$doc->Get('id');
-                                $modx->invokeEvent('OnDocFormSave', array ('mode'=>$invokemode, 'id'=>$last_docid));
-                                if (isset($documentsTv)) {
-                                    $sortids[]=$chunk['docid'];
-                                }
-                            }
-
-                    }}
-                }
-                if (isset($documentsTv)) {
-                    $sortids=implode(',',$sortids);
-                    $doc = new Document($container['sender_id'], 'id');//hier $chunk['docid']
-                    if ($documentsTv=$this->checkfieldtype($documentsTv)) {
-                        $doc->Set($documentsTv, $sortids);
-                    }
-                    $doc->Save();
-                }
-            }
-        }
-
-        if ($modx->isFrontend())//klappt nicht im Backend
-        {
-            $this->emptyCache();
-        }
-        else {
-            $this->emptyCache();
-        //$modx->clearCache();//ob das hilft, wei� ich nicht
-        }
-
-        //
-        return $last_docid;
-    }
-
-
     function emptyCache() {
         global $modx;
-/*	
-    $basePath = $modx->config['base_path'];
-    include_once $basePath."manager/processors/cache_sync.class.processor.php";
-    $sync = new synccache();
-    $sync->setCachepath($basePath."assets/cache/");
-	$sync->setReport(false);
-    $sync->emptyCache();	
-*/
+
         // empty cache
 
         include_once($modx->config['base_path'] . 'manager/processors/cache_sync.class.processor.php');
@@ -2346,274 +2021,10 @@ join $tbl_cat c on c.id = hts.category ".$wherecategorie;
         $sync->setReport(false);
         $sync->emptyCache(); // first empty the cache
 
-
     }
-
-    //-------------------------------------------------------------------------------------------------
-
-
-/*
-function saveModifiedTvs(){
-global $modx;	
-
-if (is_array($_POST['container_key']) && count($_POST['container_key']) > 0)
-{//print_r($_POST['container_key']);
-$tvIds = array_flip($_SESSION['allChunkTvNames']);
-$this->getNewMultiTvs($tvIds);
-$tmplvars=array();    
-	foreach ($_POST['container_key'] as $containerkey)
-    {//echo $containerkey;
-        if ($_POST['mChunk_oldsort_'.$containerkey] && count($_POST['mChunk_oldsort_'.$containerkey]) > 0)
-        {
-            foreach ($_POST['mChunk_oldsort_'.$containerkey] as $chunkkey)
-            {
-            	$chunk_Tvnames=$_SESSION['containerTVs'][$containerkey][$chunkkey];
-				if (is_array($chunk_Tvnames)&&count($chunk_Tvnames)>0){
-					foreach ($chunk_Tvnames as $tvid=>$tvName){
-                     $tmplvars[]=$this->saveTv_prepare($tvName.'_'.$containerkey.'_'.$chunkkey,$tvName,$chunkkey);
-					}
-				}
-            }
-        }
-    }
-
-//return;	
-$this->saveTvs($tmplvars);
 
 }
 
-return;
-}
-*/
-    function saveTv_prepare($key,$tvName,$contentid,$prefix='tv') {
-    //print_r($this->NewMultiTvs);
-
-        global $modx;
-        $value = '';
-        $tv=$this->NewMultiTvs[$tvName];
-        //print_r($tv);
-        switch ($tv['type']) {
-            case 'url':
-                $value = $_POST[$prefix .$key];
-                if ($_POST[$prefix .$key . '_prefix'] != '--') {
-                    $value = str_replace(array (
-                        "ftp://",
-                        "http://"
-                        ), "", $value);
-                    $value = $_POST[$prefix .$key . '_prefix'] . $value;
-                }
-                break;
-            case 'file':
-            // Modified by Timon for use with resource browser
-                $value = $_POST[$prefix .$key];
-                break;
-            default:
-                if (is_array($_POST[$prefix .$key])) {
-                // handles checkboxes & multiple selects elements
-                    $feature_insert = array ();
-                    $lst = $_POST[$prefix .$key];
-                    while (list ($featureValue, $feature_item) = each($lst)) {
-                        $feature_insert[count($feature_insert)] = $feature_item;
-                    }
-                    $value = implode("||", $feature_insert);
-                } else {
-                    $value = $_POST[$prefix .$key];
-                }
-                break;
-
-        }
-        //echo $_POST[$prefix .$key];
-        // save value if it was modified
-        //if (in_array($row['name'], $variablesmodified)) {
-        if (strlen($value) > 0 && $value != $tv['default_text']) {
-            $tmplvar = array (
-                'value'=>$value,
-                'tmplvarid'=>$tv['id'],
-                'contentid'=>$contentid
-            );
-        } else {
-        // Mark the variable for deletion
-            $tmplvar = array (
-                'tmplvarid'=>$tv['id'],
-                'contentid'=>$contentid
-            );
-        }
-        return $tmplvar;
-    }
-/*
-function saveTvs($tmplvars)
-{
-    global $modx;
-    $deletions = array ();
-    $tvChanges = array ();
-    foreach ($tmplvars as $field=>$value)
-    {
-        if (isset($value['value']) && ! empty($value))
-        {
-        	$tvChanges[] = $value;
-        } else
-        {
-            if (! empty($value))
-            {
-                $deletions[] = $value;
-            }
-        }
-    }
-
-    if (! empty($deletions))
-    {
-    	if (count($deletions) > 0){
-    		$del=array();
-    		foreach ($deletions as $value){
-    			$dels[$value['contentid']][$value['tmplvarid']]=$value['tmplvarid'];
-    		}
-			foreach($dels as $contentid=>$del){
-			$sql = 'DELETE FROM '.$this->tbl_tvc.' WHERE tmplvarid IN ('.implode(',', $del).') AND contentid ='.$contentid;
-			$rs = $modx->db->query($sql);   	
-			}
-		}
-    }
-        if (count($tvChanges)>0){
-        foreach ($tvChanges as $key=>$value){
-            $rs=$modx->db->select('id,value',$this->tbl_tvc,'tmplvarid="'.$value['tmplvarid'].'" AND contentid ='.$value['contentid']);
-			if ($modx->db->getRecordCount( $rs )>0){
-            	$rs=$modx->db->update($value,$this->tbl_tvc,'tmplvarid="'.$value['tmplvarid'].'" AND contentid ='.$value['contentid']);
-            }else{
-            	$rs=$modx->db->insert($value,$this->tbl_tvc);
-            }
-        }        	
-        }
-
-    return;
-}
-*/
-}
-
-class blox_Ditto {
-    function blox_Ditto($allParameters,&$blox) {
-        global $modx;
-        $this->params           = array();
-        $this->ditto_params     = array();
-        $this->forceNoResults   = '0';
-        unset($this->containerclass);
-        $this->selectParameters($allParameters);
-        $this->blox             = $blox;
-        $this->showblock        = $this->params['showblock'];
-        $this->containerparent  = $blox->docid;
-        $this->containertype    = (isset($this->params['containertype']))?$this->params['containertype']:'blox_container';
-        $this->attr_documentsTv ='';
-        if (isset($this->params['filterByField']) && isset($this->params['filterValue'])) {
-            $this->attr_filterByField=' filterByField="'.$this->params['filterByField'].'" ';
-            $this->attr_filterValue=' filterValue="'.$this->params['filterValue'].'" ';
-            $this->set('filter',$this->params['filterByField'].','.$this->params['filterValue'].',1');
-			/*
-			$extenders = isset($this->ditto_params['extenders'])?explode(',',$this->ditto_params['extenders']):array();
-			$extenders[]='documentssort';
-			$this->ditto_params['extenders']=implode(',',$extenders);	
-			*/
-        }
-        if (isset($this->params['orderByField'])) {
-            $this->attr_orderByField=' orderByField="'.$this->params['orderByField'].'" ';
-            $this->set('orderBy',$this->params['orderByField'].' ASC');
-			/*
-			$extenders = isset($this->ditto_params['extenders'])?explode(',',$this->ditto_params['extenders']):array();
-			$extenders[]='documentssort';
-			$this->ditto_params['extenders']=implode(',',$extenders);	
-			*/
-        }
-
-        if (isset($this->params['documentsTv'])) {
-            $this->attr_documentsTv=' documentsTv="'.$this->params['documentsTv'].'" ';
-            $tvoutput=$modx->getTemplateVarOutput($this->params['documentsTv']);
-            $this->set('documents',$tvoutput[$this->params['documentsTv']]);
-			/*
-			$extenders = isset($this->ditto_params['extenders'])?explode(',',$this->ditto_params['extenders']):array();
-			$extenders[]='documentssort';
-			$this->ditto_params['extenders']=implode(',',$extenders);	
-			*/
-        }
-        $this->checkContainerType();
-    }
-
-    function selectParameters($allParameters) {
-
-        $bloxParameters = array('sortable','showblock','docid','containertype','removeable','fillable','htmlouter','saveable','documentsTv','orderByField','filterByField','filterValue','theadTpl');
-        foreach ($allParameters[1] as $param=>$value) {
-            if (in_array($param,$bloxParameters) && substr($param,-3) != 'tpl') {
-                $this->params[$param] = $value;
-            }else {
-                $this->ditto_params[$param] = $value;
-            }
-        }
-    }
-
-
-    function checkContainerType() {
-    //print_r($this->params);
-
-        if($this->params['containertype']=='xcc_container') {
-            $this->containerclass='xcc_bloxcontainer';
-            $this->params['saveable']='0';
-            $this->params['removeable']='0';
-            $this->params['fillable']='0';
-        };
-
-        $parent = explode(',', $this->ditto_params['parents']);
-        if ( isset ($this->ditto_params['parents'])) {
-            if ( count($parent) == 1) {
-                $this->containerparent = $parent[0];
-                $this->containertype = 'parent_container';
-            }
-            else {
-                $this->containertype = 'container';
-                $this->containerparent = 'unknown';
-            }
-        }
-
-        if (isset($this->ditto_params['documents'])) {
-            $this->containertype = 'container';
-            $this->containerparent = 'unknown';
-        }
-    }
-
-    function set($param, $value) {
-        $this->ditto_params[$param] = $value;
-    }
-
-    function run($output_only='0') {
-        global $modx;
-        $rmclass=($this->params['removeable']=='0')?'unremoveable':'';
-        $fillclass=($this->params['fillable']=='0')?'fillable_0':'fillable_1';
-        $savable=($this->params['saveable']=='0')?'saveable="0"':'';
-        $thead='{{'.$this->params['theadTpl'].'}}';
-        $pr_tbody='';
-        $su_tbody='';
-        $pr_td='';
-        $su_td='';
-        if ($this->params['htmlouter']=='table') {
-            $pr_tbody='>'.$thead.'<tbody';
-            $su_tbody='</tbody>';
-            $pr_td='<td>';
-            $su_td='</td>';
-        }
-
-        $filterby=(isset($this->params['bloXfilterBy']))?' filterby="'.$this->params['bloXfilterBy'].'" ':'';
-        $containerclass=(isset($this->containerclass))?$this->containerclass:'bloxcontainer';
-        if ($this->forceNoResults !== '1') {
-            $ditto_output = $modx->runSnippet('Ditto', $this->ditto_params);
-        }else {
-            $ditto_output = $this->ditto_params['noResults'];
-        }
-        $blox_dummy = '<'.$this->htmlinner.' class="bildchunk blox clearfix bloxdummy hidden" resourceclass="modDummy" rowid="dummy" >
-                      '.$pr_td.'Dummy'.$su_td.'
-                      </'.$this->htmlinner.'>';
-        $output = '<'.$this->params['htmlouter'].$pr_tbody.' id="'.$this->showblock.'" class="'.$containerclass.' '.$rmclass.' '.' '.$fillclass.' '.$saveclass.'" c_type="'.$this->containertype.'" c_parentid="'.$this->containerparent.'" sender_id="'.$modx->documentIdentifier.'" '.$savable.$this->attr_documentsTv.$this->attr_orderByField.$this->attr_filterByField.$this->attr_filterValue.' >';
-        $output .= $blox_dummy.$ditto_output;
-        $output .= $su_tbody.'</'.$this->params['htmlouter'].'>';
-
-        return ($output_only=='0')?$output:$ditto_output;
-    }
-}
 
 class xedit_db {
     function xedit_db( & $blox) {

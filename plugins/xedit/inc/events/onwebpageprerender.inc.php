@@ -27,6 +27,11 @@ if (empty($mootools)){
 	';
 }
 
+$datepicker='
+<link href="/assets/plugins/xedit/js/moodatepicker/datepicker.css" rel="stylesheet" media="screen" type="text/css" />
+<script type="text/javascript" src="/assets/plugins/xedit/js/moodatepicker/datepicker.js"></script>
+';
+
 $filemanager='
 	<link rel="stylesheet" media="all" type="text/css" href="/assets/plugins/xedit/inc/FileManager/Css/FileManager.css" />
 	<link rel="stylesheet" media="all" type="text/css" href="/assets/plugins/xedit/inc/FileManager/Css/Additions.css" />
@@ -59,6 +64,7 @@ $filemanager='
         <link href="{$site_url}assets/snippets/maxigallery/css/default.css" rel="stylesheet" media="screen" type="text/css" /> 
 	    {$mootools}
 		{$filemanager}
+		{$datepicker}
 	<script src="{$site_url}assets/plugins/xedit/js/blox_sortables.js" type="text/javascript"></script>
 	<script src="{$site_url}assets/plugins/xedit/js/moorte/js/mooRTE/moorte.js" type="text/javascript"></script>
 	<script src="{$site_url}assets/plugins/xedit/js/editx_bruno.js" type="text/javascript"></script>		

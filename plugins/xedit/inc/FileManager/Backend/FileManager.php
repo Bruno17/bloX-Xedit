@@ -100,6 +100,7 @@ class FileManager {
 		
 		echo json_encode(array(
 			'path' => $this->getPath($dir),
+			'baseUrl'=>$this->options['baseURL'],//added by Bruno
 			'dir' => array(
 				'name' => pathinfo($dir, PATHINFO_BASENAME),
 				'date' => date($this->options['dateFormat'], filemtime($dir)),
@@ -117,8 +118,8 @@ class FileManager {
 		if (!$this->checkFile($file)) return;
 		
 		require_once($this->options['id3Path']);
-		
-		$url = $this->options['baseURL'] . $this->normalize(substr($file, strlen($this->path)+1));
+		//added by Bruno: $this->options['domain']. 
+		$url = $this->options['domain'].$this->options['baseURL'] . $this->normalize(substr($file, strlen($this->path)+1));
 		$mime = $this->getMimeType($file);
 		$content = null;
 		if (FileManagerUtility::startsWith($mime, 'image/')){
@@ -187,7 +188,7 @@ class FileManager {
 		
 		$file = $this->getName($this->post['file'], $this->getDir($this->post['directory']));
 		if (!$file) return;
-		
+
 		mkdir($file);
 		
 		$this->onView();
@@ -288,6 +289,7 @@ class FileManager {
 			$files[] = pathinfo($f, PATHINFO_FILENAME);
 		
 		$pathinfo = pathinfo($file);
+		
 		$file = $dir . '/' . FileManagerUtility::pagetitle($pathinfo['filename'], $files).(!empty($pathinfo['extension']) ? '.' . $pathinfo['extension'] : null);
 		
 		return !$file || !FileManagerUtility::startsWith($file, $this->basedir) || file_exists($file) ? null : $file;
@@ -307,7 +309,9 @@ class FileManager {
 	}
 	
 	protected function getDir($dir){
+		//echo $dir.'   '.$this->basename.'   '.$this->path;
 		$dir = realpath($this->path . '/' . (FileManagerUtility::startsWith($dir, $this->basename) ? $dir : $this->basename));
+		
 		return $this->checkFile($dir) ? $dir : $this->basedir;
 	}
 	

@@ -7,8 +7,8 @@ $basePath = $modx->config['base_path'];
  * Todos:
  * rowTpl - 
  * &rowTpl = `@FIELD:`
- * &xeditTabs = `@FIELD:` - Datensatzfeld, wechselnd von Datensatz zu Datensatz 
- * &xeditTabs = `@TV:` - in TV des aufrufenden Documents - done
+ * &xedit_tabs = `@FIELD:` - Datensatzfeld, wechselnd von Datensatz zu Datensatz 
+ * &xedit_tabs = `@TV:` - in TV des aufrufenden Documents - done
  * 
  * 
  * container-typen einbauen
