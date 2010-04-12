@@ -1,5 +1,7 @@
 <?php
 //print_r($row);
+
+
 $timestampstart = $this->xettcal->get_ts_daystart($row['timestamp']);
 $timestampend = $this->xettcal->get_ts_dayend($row['timestamp']);
 $startDate = xetadodb_strftime("%Y-%m-%d", $timestampstart);

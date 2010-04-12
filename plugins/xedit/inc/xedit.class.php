@@ -436,6 +436,99 @@ class xedit {
         return;
     }
 
+    function regSciptsAndCss()
+    {
+    
+        global $modx;
+    
+        //only for the first permission-test
+        //we need more different permissions later
+        //see config.php
+        //$_SESSION['xedit_runs']='0';
+    
+        if ($GLOBALS['xedit_runs'] == '1')
+        {
+            //$_SESSION['xedit_runs']='1';
+            $managerPath = $modx->getManagerPath();
+            $doc_id = $modx->documentObject['id'];
+            ;
+            $site_url = MODX_BASE_URL;
+            $app_url = $site_url.'assets/plugins/xedit/';
+            $session_id = session_id();
+            //$output= $modx->documentOutput;
+    
+            //quick fix: switch mootools version
+    
+            $tv = $modx->getTemplateVarOutput( array ("mootools"), $doc_id);
+            $mootools = $tv['mootools'];
+            if ( empty($mootools))
+            {
+                $mootools = '
+    			<script src="/assets/plugins/xedit/js/mootools-1.2.3.js" type="text/javascript"></script>
+    			<script src="/assets/plugins/xedit/js/mootools-1.2.3.1-more.js" type="text/javascript"></script>	
+    			';
+            }
+    
+            $filemanager = '
+    		<link rel="stylesheet" media="all" type="text/css" href="/assets/plugins/xedit/inc/FileManager/Css/FileManager.css" />
+    		<link rel="stylesheet" media="all" type="text/css" href="/assets/plugins/xedit/inc/FileManager/Css/Additions.css" />
+    		<script type="text/javascript" src="/assets/plugins/xedit/inc/FileManager/Source/FileManager.js"></script>
+    		<script type="text/javascript" src="/assets/plugins/xedit/inc/FileManager/Source/Language/Language.en.js"></script>
+    		<script type="text/javascript" src="/assets/plugins/xedit/inc/FileManager/Source/Language/Language.de.js"></script>
+    		<script type="text/javascript" src="/assets/plugins/xedit/inc/FileManager/Source/Additions.js"></script>
+    	
+    		<script type="text/javascript" src="/assets/plugins/xedit/inc/FileManager/Source/Uploader/Fx.ProgressBar.js"></script>
+    		<script type="text/javascript" src="/assets/plugins/xedit/inc/FileManager/Source/Uploader/Swiff.Uploader.js"></script>
+    
+    		<script type="text/javascript" src="/assets/plugins/xedit/inc/FileManager/Source/Uploader.js"></script>
+    		<script type="text/javascript" src="/assets/plugins/xedit/inc/FileManager/Source/Gallery.js"></script>
+    		';
+    
+    
+            $ajax_url = $GLOBALS['ajax_url'];//from onparsedocument
+            $front_ajax_url = $GLOBALS['ajax_urls']['front_ajax_url'];//from onparsedocument
+    
+            $_SESSION['xedit_moduleURL'] = $ajax_url;
+    
+            //CSS
+            $modx->regClientCSS($app_url.'js/moorte/js/mooRTE/moorte.css');
+            $modx->regClientCSS($app_url.'/css/xcc.css');
+            $modx->regClientCSS($app_url.'/css/sexyalertbox.css');
+            $modx->regClientCSS($app_url.'/css/screen.css');
+            $modx->regClientCSS($site_url.'assets/snippets/maxigallery/css/default.css');
+            //js
+            $modx->regClientStartupScript($mootools, true);
+            $modx->regClientStartupScript($filemanager, true);
+ 			$modx->regClientCSS($app_url.'js/moodatepicker/datepicker.css');
+            $modx->regClientStartupScript($app_url.'js/moodatepicker/datepicker.js');
+            $modx->regClientStartupScript($app_url.'js/blox_sortables.js');
+            $modx->regClientStartupScript($app_url.'js/moorte/js/mooRTE/moorte.js');
+            $modx->regClientStartupScript($app_url.'js/editx_bruno.js');
+            $modx->regClientStartupScript($app_url.'js/tabs.js');
+            $modx->regClientStartupScript($app_url.'js/groar.js');
+            $modx->regClientStartupScript($app_url.'js/xedit_xcc.js');
+            $modx->regClientStartupScript($app_url.'js/sexyalertbox.js');
+            $modx->regClientStartupScript($app_url.'js/ckeditor/ckeditor.js');
+    
+    
+            $js = "
+    		var ajax_url = '{$ajax_url}';
+    		var doc_id = '{$doc_id}';
+    		var sessionId = '{$session_id}';
+    		var front_ajax_url = '{$front_ajax_url}';
+    		window.addEvent('domready', function(){
+    		mySortables = new blox_Sortables();
+    		mte = new MooRTE({elements:'.xedit',location:'pagetop'});
+    		brunoclass = new Xedit.brunoclass();
+    		xtoolsStart = new Xedit.xtools();
+    		startXtools();
+    		startxcc();
+    		});
+    		";
+            $modx->regClientStartupScript('<script type="text/javascript" >'.$js.'</script>', true);
+    
+        }
+    }
 
     /////////////////////////////////////////////////////////////////////////////
     //function to check for permission
@@ -602,7 +695,7 @@ $path=$this->container['params']['filemanager'][$fieldtype.'_path'];
 
 if ($bloxProps !== ''){
 
-$bloxProps = (array)json_decode($bloxProps, true);
+$bloxProps = (array)json_decode(stripslashes($bloxProps), true);
 $docid = $bloxProps[0]['sender_id'];
 $rowid = $bloxProps[0]['chunks'][0]['rowid'];
 $tablename = $bloxProps[0]['chunks'][0]['tablename'];
@@ -876,13 +969,16 @@ where sc.id=$docid and c.category='$containerTvs'
         
                 if ( isset ($_POST['xedit_tabs']) && ! empty($_POST['xedit_tabs']) && isset ($_POST['containers']))
                 {
-                    $containers = (array)json_decode(($_POST['containers']), true);
-                    $xedit_tabs = explode(':', $_POST['xedit_tabs']);
-                    if ($xedit_tabs[0] == '@TV')
+                    //$_POST['containers']='[{"containerid":"Meldungen","c_parentid":null,"documentsTv":"0","orderByField":"0","filterByField":"0","filterValue":"0","sender_id":"504","c_type":"blox_container","c_resourceclass":"modTable","c_tablename":"regatta_meldungen","chunks":[{"rowid":"new","modified":"no","savemode":"copy","tpl":"0","chunkname":"@FILE:assets/snippets/blox/projects/custom/regatta/regatta_meldung/templates/meldungTpl.html","xedit_tabs":"@TV:xeditTabs","parent":null,"published":null,"resourceclass":"modTable","tablename":"regatta_meldungen","fields":[{"fieldname":"eventjahr","postname":"eventjahr_Meldungen_0_new_regatta_meldungen_new","resourceClass":"modTable","tablename":"regatta_meldungen","rowid":"new"}]}]}] ';
+					
+					
+					$containers = (array)json_decode((stripslashes($_POST['containers'])), true);
+					$xedit_tabs = explode(':', $_POST['xedit_tabs']);
+					if ($xedit_tabs[0] == '@TV')
                     {
-        
                         $tv = $modx->getTemplateVarOutput($xedit_tabs[1], $containers[0]['sender_id']);
                         $settings = $tv[$xedit_tabs[1]];
+					
                     }
                     if ($xedit_tabs[0] == '@CONFIG')
                     {
@@ -1179,7 +1275,9 @@ where sc.id=$docid and c.category='$containerTvs'
     {
     
         $GLOBALS['xedit_runs'] = '1';
+		$_SESSION['xedit_runs']='1';
         //$GLOBALS['ajax_url'] = $this->makeAjaxUrl();
+        $this->regSciptsAndCss();		
     }
 	$body_top='';
 	
@@ -1225,7 +1323,7 @@ where sc.id=$docid and c.category='$containerTvs'
         $chunk_tabs = array ();
         $chunknames = array ();
         //$allowed_chunks = array();
-    
+
         foreach ($blox_settings as $value)
         {
             $container_array = explode(':', $value);
@@ -1868,9 +1966,9 @@ join $tbl_cat c on c.id = hts.category ".$wherecategorie;
 
     function saveFrontEndTvTabs() {
         global $modx;
-
+            
         if (isset($this->container['params']['onbeforesave'][$_POST['onbeforesave']])){
-        $settings = $this->container['params']['onbeforesave'][$_POST['onbeforesave']]; 
+ 		$settings = $this->container['params']['onbeforesave'][$_POST['onbeforesave']]; 
         $tab=explode(':',$settings);
 		if (trim($tab[0])=='@CHUNK') {
         $onbeforesave=$modx->parseDocumentSource('{{'.trim($tab[1]).'}}');
@@ -1902,7 +2000,7 @@ join $tbl_cat c on c.id = hts.category ".$wherecategorie;
 		$containers[0]['chunks']=$chunks;		
         */
         //print_r($_POST);
-        $containers = (array)json_decode(($_POST['coll_container']), true);
+        $containers = (array)json_decode(stripslashes($_POST['coll_container']), true);
         //print_r($containers);
 
         $last_docid=$this->saveModifiedChunks($containers);
@@ -2125,7 +2223,7 @@ class xedit_db {
 			
             if (count($chunk['fields']) > 0) {
                 foreach ($chunk['fields'] as $field) {
-                    $this->setfield($field);
+                 if(!empty($field['fieldname'])) $this->setfield($field);
                 }
             }
 

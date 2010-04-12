@@ -32,7 +32,7 @@ Mietbeginn
 </td>
 <td colspan="2">
 <input id="dp-startdate" 
-class="fdp bloxinput" rangelow = "[+range_low+]" rangehigh="[+range_high+]" 
+class="fdp bloxinput" rangelow = "[+range_low+]" rangehigh="[+range_high+]" endpicker="dp-enddate"
 type="text" maxlength="10" value="[+Time:date_ger=`%d.%m.%Y`+]" name="startdate"/>		
 </td>
 </tr>
@@ -42,7 +42,7 @@ Mietende
 </td>
 <td colspan="2">
 <input id="dp-enddate" 
-class="fdp bloxinput" rangelow = "[+range_low+]" rangehigh="[+range_high+]" 
+class="fdp bloxinput" rangelow = "[+range_low+]" rangehigh="[+range_high+]" startpicker="dp-startdate"
 type="text" maxlength="10" value="[+Timeend:date_ger=`%d.%m.%Y`+]" name="enddate"/>		
 </td>
 </tr>

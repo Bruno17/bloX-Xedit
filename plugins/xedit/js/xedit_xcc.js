@@ -3,17 +3,17 @@
  */
 		//window.addEvent('domready', function() {
 		var startxcc = function(){
-		var tabs1 = new SimpleTabs('xcc_blox_block', { 					// erst Tabs einrichten, damit die Höhe für das Auswählen stimmt
+		var tabs1 = new XCCSimpleTabs('xcc_blox_block', { 					// erst Tabs einrichten, damit die Höhe für das Auswählen stimmt
 			selector: 'h4'
 		});	
 
-		var tabs2 = new SimpleTabs($('xcc_settings_block').getElement('.tab_block'), { 				// erst Tabs einrichten, damit die Höhe für das Auswählen stimmt
+		var tabs2 = new XCCSimpleTabs($('xcc_settings_block').getElement('.tab_block'), { 				// erst Tabs einrichten, damit die Höhe für das Auswählen stimmt
 			selector: 'h4'
 		});	
 
 		//Bruno - hier noch ein extra div tab_block eingebaut sonst zerhauts das Formular
 		
-		var tabs3 = new SimpleTabs($('xcc_tvs_block').getElement('.tab_block'), { 					// erst Tabs einrichten, damit die Höhe für das Auswählen stimmt
+		var tabs3 = new XCCSimpleTabs($('xcc_tvs_block').getElement('.tab_block'), { 					// erst Tabs einrichten, damit die Höhe für das Auswählen stimmt
 			selector: 'h4'
 		});	
 		

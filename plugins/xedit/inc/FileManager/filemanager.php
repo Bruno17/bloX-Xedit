@@ -1,5 +1,6 @@
 <?php
 
+
 include($pluginpath.'inc/FileManager/Backend/FileManager.php');
 
 // Please add your own authentication here
@@ -15,18 +16,19 @@ $bloxProps=(isset($_REQUEST['bloxProps']))?$_REQUEST['bloxProps']:'';
 $directory = $xedit->makeFileManagerPath($fieldtype,$bloxProps);
 
 $parts=explode('/',$directory);
+
 unset($parts[count($parts)-1]);
-$url=implode('/',$parts).'/';
+$url=(count($parts)>0)?implode('/',$parts).'/':'';
 
 $browser = new FileManager(array(
 	'directory' => $basePath.'assets/'.$directory,
 	'assetBasePath' => $basePath.'assets/plugins/xedit/inc/FileManager/Assets',
-	'domain' => 'http://bruno.tattoocms.de/',
+	'domain' => $modx->config['site_url'],
 	'baseURL' => 'assets/'.$url,
 	'upload' => true,
 	'destroy' => true
 ));
 
-$modx->logEvent(0, 1, print_r($_REQUEST,true) , 'filemanager');
+//$modx->logEvent(0, 1, print_r($_REQUEST,true) , 'filemanager');
 
 $browser->fireEvent(!empty($_REQUEST['event']) ? $_REQUEST['event'] : null);

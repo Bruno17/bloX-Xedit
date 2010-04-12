@@ -125,6 +125,7 @@ function getMonthDays($year, $month)
 //Monatskalender anzeigen (monthTpl,weedaysTpl)
 ////////////////////////////////////////////////////////
 function makeMonthArray($xetconfig,$monthcal,$output_arr=array(),$events=array()) {
+	global $modx;
 	$weeks = $monthcal['weeks'];
 	$tmpmonth = $monthcal['month'];
 	$tmpyear = $monthcal['year'];
@@ -143,6 +144,30 @@ function makeMonthArray($xetconfig,$monthcal,$output_arr=array(),$events=array()
 	$month_arr=array();
 	$weekdays=array();
 	//$month_arr['weekdays'] = $weekdays;
+
+
+
+$timestamp = xetadodb_mktime(0, 0, 0, xetadodb_date("m", $monthtimestamp)-1, '01', xetadodb_date("Y", $monthtimestamp));
+$link['month'] = xetadodb_date("m", $timestamp);
+$link['year'] = xetadodb_date("Y", $timestamp);
+$month_arr['link_prevmonth']=$this->blox->smartModxUrl($modx->documentObject["id"],NULL, $link);
+$timestamp = xetadodb_mktime(0, 0, 0, xetadodb_date("m", $monthtimestamp)+1, '01', xetadodb_date("Y", $monthtimestamp));
+$link['month'] = xetadodb_date("m", $timestamp);
+$link['year'] = xetadodb_date("Y", $timestamp);
+$month_arr['link_nextmonth']=$this->blox->smartModxUrl($modx->documentObject["id"],NULL, $link);
+$timestamp = xetadodb_mktime(0, 0, 0, xetadodb_date("m", $monthtimestamp), '01', xetadodb_date("Y", $monthtimestamp)-1);
+$link['month'] = xetadodb_date("m", $timestamp);
+$link['year'] = xetadodb_date("Y", $timestamp);
+$month_arr['link_prevyear']=$this->blox->smartModxUrl($modx->documentObject["id"],NULL, $link);
+$timestamp = xetadodb_mktime(0, 0, 0, xetadodb_date("m", $monthtimestamp), '01', xetadodb_date("Y", $monthtimestamp)-1);
+$link['month'] = xetadodb_date("m", $timestamp);
+$link['year'] = xetadodb_date("Y", $timestamp);
+$month_arr['link_nextyear']=$this->blox->smartModxUrl($modx->documentObject["id"],NULL, $link);	
+$link=array();
+$removearray=array('tsday');
+$link['tsmonth'] = $monthtimestamp;
+$month_arr['link_tsmonth']=$this->blox->smartModxUrl($modx->documentObject["id"],NULL, $link,$removearray);		
+	
 	$month_arr['tsmonth'] = $monthtimestamp;
 	$month_arr['innerrows']['week'] = $weeks_arr;
 	$month_arr['innerrows']['weekdays'][] = $weekdays;
@@ -213,7 +238,7 @@ function makeWeekArray($xetconfig,$week = array (), $weekdays = array (), $event
 //////////////////////////////////////////////////////
 //Daten-Template generieren (datarowTpl,dataouterTpl)
 //////////////////////////////////////////////////////
-function makeDayArray($xetconfig,$events, $date) {
+function makeDayArray($xetconfig,$events, $date, $sortOrder='ASC') {
 	global $modx;
 	
 	if (is_array($events)) {
@@ -232,7 +257,8 @@ function makeDayArray($xetconfig,$events, $date) {
 		$weekeventscount = 0;
 		$montheventscount = 0;
 		$yeareventscount = 0;
-		$theyearend = $themonthend = $theweekend = $thedayend = -10000000000000;
+		$theyearend = $themonthend = $theweekend = $thedayend = $sortOrder=='ASC'? -10000000000000:10000000000000;
+		$theyearstart = $themonthstart = $theweekstart = $thedaystart = $sortOrder=='ASC'? -10000000000000:10000000000000;
 		$rowscount = count($events);
 		foreach ($events as $event) {
 			$ID = $event['ID'];
@@ -253,30 +279,82 @@ function makeDayArray($xetconfig,$events, $date) {
 			$eventweekend = $this->get_ts_weekend($event['Time']);
 			$eventmonthend = $this->get_ts_monthend($event['Time']);
 			$eventyearend = $this->get_ts_yearend($event['Time']);
-			if ($event['Time'] > $thedayend) {
-				$dayeventscount = 1;
-				$thedayend = $eventdayend;
-			} else {
-				$dayeventscount++;
-			}
-			if ($event['Time'] > $theweekend) {
-				$weekeventscount = 1;
-				$theweekend = $eventweekend;
-			} else {
-				$weekeventscount++;
-			}
-			if ($event['Time'] > $themonthend) {
-				$montheventscount = 1;
-				$themonthend = $eventmonthend;
-			} else {
-				$montheventscount++;
-			}
-			if ($event['Time'] > $theyearend) {
-				$yeareventscount = 1;
-				$theyearend = $eventyearend;
-			} else {
-				$yeareventscount++;
-			}
+
+            if ($sortOrder == 'ASC')
+            {
+                if ($event['Time'] > $thedayend)
+                {
+                    $dayeventscount = 1;
+                    $thedayend = $eventdayend;
+                } else
+                {
+                    $dayeventscount++;
+                }
+                if ($event['Time'] > $theweekend)
+                {
+                    $weekeventscount = 1;
+                    $theweekend = $eventweekend;
+                } else
+                {
+                    $weekeventscount++;
+                }
+                if ($event['Time'] > $themonthend)
+                {
+                    $montheventscount = 1;
+                    $themonthend = $eventmonthend;
+                } else
+                {
+                    $montheventscount++;
+                }
+                if ($event['Time'] > $theyearend)
+                {
+                    $yeareventscount = 1;
+                    $theyearend = $eventyearend;
+                } else
+                {
+                    $yeareventscount++;
+                }
+            
+            
+            } else
+            {
+                if ($event['Time'] < $thedaystart)
+                {
+                    $dayeventscount = 1;
+                    $thedaystart = $eventdaystart;
+                } else
+                {
+                    $dayeventscount++;
+                }
+                if ($event['Time'] < $theweekstart)
+                {
+                    $weekeventscount = 1;
+                    $theweekstart = $eventweekstart;
+                } else
+                {
+                    $weekeventscount++;
+                }
+                if ($event['Time'] < $themonthstart)
+                {
+                    $montheventscount = 1;
+                    $themonthstart = $eventmonthstart;
+                } else
+                {
+                    $montheventscount++;
+                }
+                if ($event['Time'] < $theyearstart)
+                {
+                    $yeareventscount = 1;
+                    $theyearstart = $eventyearstart;
+                } else
+                {
+                    $yeareventscount++;
+                }
+            
+            }
+
+
+
 			$rowid++;
 			$event['rowid'] = $rowid;
 			$event['rowscount'] = $rowscount;
@@ -317,6 +395,10 @@ function makeDayArray($xetconfig,$events, $date) {
 	}
  	//$tpl = new mgChunkie($this->xettpl['dataouterTpl']);
 	$day_array = array ();
+    $link = array ();
+	$removearray=array('tsmonth');
+    $link['tsday'] = $date;
+    $day_array['link_tsday'] = $this->blox->smartModxUrl($modx->documentObject["id"], NULL, $link,$removearray);
 	$day_array['date'] = $date;
 	$day_array['daytimestamp'] = $date;
 	$day_array['tsday'] = $date;

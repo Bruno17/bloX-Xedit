@@ -49,7 +49,7 @@ if ( isset ($_REQUEST['eventID']))
     $limit = 1;
 
     //$easyevents=$ee->getEvents($startDate,$endDate,$contentFields,$limit);
-    $this->xettcal->xetconfig = $this->xetconfig;
+    $this->xettcal->xetconfig = $this->bloxconfig;
     $easyevents = $this->xettcal->getEvents($startDate, $endDate, $contentFields, $limit, $orderDir, $room_id);
     if (count($easyevents) > 0)
     {
@@ -60,7 +60,7 @@ if ( isset ($_REQUEST['eventID']))
         //$arrtime=explode(':',$eetime);
         $timestamp_high = xetadodb_mktime(00, 00, 00, $arrdate[1], $arrdate[2], $arrdate[0]);
     }
-    $event['range_high'] = xetadodb_strftime("%Y%m%d", $timestamp_high);
+echo    $event['range_high'] = xetadodb_strftime("%d-%m-%Y", $timestamp_high);
     $timestamp_low = $event['Time']-86400*30;
     $timestampend = xetadodb_mktime(00, 00, 00, $startdate[1], $startdate[2]-1, $startdate[0]);
 }
@@ -100,7 +100,7 @@ else
             }
         }
     }
-    $event['range_high'] = xetadodb_strftime("%Y%m%d", $timestamp_high);
+    $event['range_high'] = xetadodb_strftime("%d-%m-%Y", $timestamp_high);
     $timestamp_low = $now-86400*30;
     $timestampend = xetadodb_mktime(00, 00, 00, $getmonth, $getday, $getyear);
 }
@@ -124,7 +124,7 @@ if (count($easyevents) > 0)
     //$event['Timeend']=adodb_mktime(00, 00, 00, $arrdate[1], $arrdate[2], $arrdate[0]);
     $timestamp_low = xetadodb_mktime(00, 00, 00, $arrdate[1], $arrdate[2], $arrdate[0]);
 }
-$event['range_low'] = xetadodb_strftime("%Y%m%d", $timestamp_low);
+$event['range_low'] = xetadodb_strftime("%d-%m-%Y", $timestamp_low);
 $bloxdatas = $event;
 $bloxdatas['POST'] = $posts;
 unset ($easyevents);

@@ -41,8 +41,8 @@ $params['chunk_SettingFields']='blox_template:text,ditto_hiddenfields:text,xedit
 $params['template_SettingFields']='blox_settings:textarea,setting_tabs:textarea,tv_tabs:textarea,xedit_tabs:textarea';
 
 //default
-$params['filemanager']['image_path']='images/';
-$params['filemanager']['file_path']='files/';
+$params['filemanager']['image_path']='images';
+$params['filemanager']['file_path']='files';
 
 //different path per page:
 $params['filemanager']['image_path_TV']='imagespath';//used if not empty

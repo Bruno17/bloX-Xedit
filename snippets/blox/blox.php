@@ -111,6 +111,7 @@ $bloxconfig['rowTpl']=(isset($rowTpl))?$rowTpl:'';
 //$bloxconfig['where']=(isset($where))?$where:'';
 $bloxconfig['fields']=(isset($fields))?$fields:'*';
 $bloxconfig['orderBy']=(isset($orderBy))?$orderBy:'';
+$bloxconfig['groupBy']=(isset($groupBy))?$groupBy:'';
 $bloxconfig['perPage']=(isset($perPage))?$perPage:10;
 $bloxconfig['numLinks']=(isset($numLinks))?$numLinks:5;
 //Todo: pagestart+id for multiple containers with pagination
@@ -192,6 +193,7 @@ switch($includeclass)
         if (class_exists($includeclass))
         {
             $blox->xettcal = new xettcal($bloxconfig['id']);
+			$blox->xettcal->blox= &$blox;
         } else
         {
             $output = $includeclass.' class not found';

@@ -504,7 +504,7 @@ Xedit.brunoclass = new Class({
 	},
 
     sendBloxForm: function(form,mode){
-    
+        var editingElement = this.editingElement;
         var coll_inputs = this.getEditingProps();
 		var input = new Element('input', {
             id: 'coll_container',
@@ -765,7 +765,7 @@ Xedit.brunoclass = new Class({
 				blox_area_edit.inject($(area_inner,'top'));									// Nei mit dem Container....
 				blox_area_edit.set('html',responseText);					   
  
-				var tabs3 = new SimpleTabs(blox_area_edit.getElement('.tab_block'), { 						// Tabs einrichten
+				var tabs3 = new XCCSimpleTabs(blox_area_edit.getElement('.tab_block'), { 						// Tabs einrichten
 					selector: 'h4'
 				});	
 				var resize = new calc();

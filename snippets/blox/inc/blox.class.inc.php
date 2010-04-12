@@ -1127,6 +1127,7 @@ class blox {
     
         $where = $this->bloxconfig['where'];
         $orderBy = $this->bloxconfig['orderBy'];
+		$groupby = $this->bloxconfig['groupBy'] !==''?' GROUP BY '.$this->bloxconfig['groupBy']:'';
         $pageStart = $this->bloxconfig['pageStart'];
         $perPage = $this->bloxconfig['perPage'];
         $numLinks = $this->bloxconfig['numLinks'];
@@ -1159,10 +1160,10 @@ class blox {
             }
         }
         */
-        $rs = $modx->db->select($this->bloxconfig['distinct'].' '.$fields, $table, $where);
+        $rs = $modx->db->select($this->bloxconfig['distinct'].' '.$fields, $table, $where.$groupby);
         $this->totalCount = $modx->db->getRecordCount($rs);
 
-        $rs = $modx->db->select($this->bloxconfig['distinct'].' '.$fields, $table, $where, $orderBy, $start.', '.$perPage);
+        $rs = $modx->db->select($this->bloxconfig['distinct'].' '.$fields, $table, $where.$groupby, $orderBy, $start.', '.$perPage);
         $this->columnNames = $modx->db->getColumnNames( $rs );	// Get column names - in the order you select them     
         $rows = $modx->db->makeArray($rs);    
     
@@ -1181,6 +1182,7 @@ class blox {
     
         $where = $this->bloxconfig['where'];
         $orderby = $this->bloxconfig['orderBy'];
+		$groupby = $this->bloxconfig['groupBy'] !==''?' GROUP BY '.$this->bloxconfig['groupBy']:'';
         $pageStart = $this->bloxconfig['pageStart'];
         $perPage = $this->bloxconfig['perPage'];
         $numLinks = $this->bloxconfig['numLinks'];
@@ -1302,7 +1304,8 @@ class blox {
                 $matchTvJoins
                         WHERE 1
                 $tvNames
-                $where        
+                $where
+				$groupby        
                 $orderby ";
         // Get rows
         //echo $sql;
@@ -1414,7 +1417,7 @@ class blox {
  * echo smartModxUrl($modx->documentObject["id"],NULL, $link);
  */
 
-function smartModxUrl($docid, $docalias, $array_values) {
+function smartModxUrl($docid, $docalias, $array_values,$removearray=array()) {
 		global $modx;
 		$array_url = $_GET;
 		$urlstring = array();
@@ -1425,7 +1428,7 @@ function smartModxUrl($docid, $docalias, $array_values) {
 		$array_url = array_merge($array_url,$array_values);
 
 		foreach ($array_url as $name => $value) {
-			if (!is_null($value)) {
+			if (!is_null($value)&& !in_array($name,$removearray)) {
 			  $urlstring[] = $name . '=' . urlencode($value);
 			}
 		}

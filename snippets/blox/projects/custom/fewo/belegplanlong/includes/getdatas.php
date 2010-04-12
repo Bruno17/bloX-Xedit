@@ -2,6 +2,7 @@
 global $modx;
 
 
+
 $firstmonth = abs($this->bloxconfig['month']);
 $year=$this->bloxconfig['year'];
 

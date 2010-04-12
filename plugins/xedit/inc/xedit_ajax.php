@@ -35,7 +35,8 @@ if ( isset ($_POST['save_tv_tabs']))
 
 if ( isset ($_POST['editx']))
 {
-    $editx = (array)json_decode(($_POST['editx']), true);
+    //$editx = (array)json_decode(($_POST['editx']), true);
+    $editx = (array)json_decode(stripslashes($_POST['editx']), true);
     //$xedit->docid = 55;
     //print_r($editx);
 

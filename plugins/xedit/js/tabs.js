@@ -15,7 +15,7 @@
  */
 
 
-var SimpleTabs = new Class({
+var XCCSimpleTabs = new Class({
 
 	Implements: [Events, Options],
 
