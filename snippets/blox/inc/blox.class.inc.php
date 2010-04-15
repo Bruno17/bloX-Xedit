@@ -984,6 +984,7 @@ class blox {
         $alias=$resourceclass=='modDocument'?'sc.':'';
 
         $where = '';
+		$delimiter='|';
 
         foreach ($filterarray as $filter) {
             if (! empty($filter)) {
@@ -1007,13 +1008,15 @@ class blox {
                     case '++':
                         $where .= ' AND ';
                         break;
-                    default:
-                        $pieces = explode('|', $filter);
-                        if (count($pieces) == 3) {
-                            $o_enc = '"';
-                            $c_enc = '"';
-                            switch($pieces[2])
+                        default:
+                            $pieces = explode($delimiter, $filter);
+                            if (count($pieces) == 3)
                             {
+                                $o_enc = '"';
+                                $c_enc = '"';
+								$pieces[1] = ($pieces[1] == '#EMPTY#')?'':$pieces[1];
+                                switch($pieces[2])
+                                {
                                 case 'IN':
                                     $o_enc = '(';
                                     $c_enc = ')';
@@ -1027,12 +1030,17 @@ class blox {
                                 case 'lt':
                                     $pieces[2] = '<=';
                                     break;
+                                case 'isempty':
+								case 'not isempty':
+                                    $o_enc = '(';
+                                    $c_enc = ')';
+									$pieces[1]=$pieces[0];
+									$scipfield=true;								
+                                    break;									
                                 default:
                                     break;
                             }
-							$field = '`'.$field.'`';
-
-                                $field = $pieces[0];
+		                        $field = $pieces[0];
                                 if ($resourceclass == 'modDocument' && in_array($field, $this->tvnames))
                                 {
                                     $TVarray[] = $field;
@@ -1041,10 +1049,10 @@ class blox {
                                 }
                                 else
                                 {
-                                    $field = $alias.'`'.$field.'`';
+                                    $field = $scipfield?'':$alias.'`'.$field.'`';
                                 }
                            
-                            $where .= $o_bracket.$field.$pieces[2].' '.$o_enc.$pieces[1].$c_enc.' '.$c_bracket;
+                            $where .= $o_bracket.$field.$pieces[2].$o_enc.$pieces[1].$c_enc.' '.$c_bracket;
                         }
                         break;
                 }
@@ -1109,14 +1117,19 @@ class blox {
 		return $result;   	
     }
 
-    function checkXCCbuttons($result){
+    function checkXCCbuttons($rows){
         //add button arround this row for blox-creating
-		if ($this->bloxconfig['c_type'] == 'xcc_container'&& count($result)>0){
-			foreach($result as & $row){
-				$row['makexccbutton']='1';
-			}
-		} 
-		return $result;   	
+        if ($this->bloxconfig['c_type'] == 'xcc_container'&& count($result)>0) {
+            $result=array();
+            foreach($rows as $row){
+                $row['makexccbutton']='1';
+                $result[]=$row;
+            }
+        }
+        else { 
+            return $rows; 
+        }
+        return $result;
     }
 
     function gettablerows()
