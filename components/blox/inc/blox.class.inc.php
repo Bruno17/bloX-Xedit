@@ -32,7 +32,7 @@ class blox {
 		//bloxcontainer 
 	 
         $this->containerattributes=$this->addBloxAttributes('id,xedit_tabs,tablename,resourceclass,saveable,c_type,c_parentid',$attributes=array());
-        $this->containerattributes = $this->addAttribute('sender_id',$modx->documentIdentifier,$this->containerattributes);
+        $this->containerattributes = $this->addAttribute('sender_id',$modx->resource->get('id'),$this->containerattributes);
         if ($this->bloxconfig['c_type'] == 'xcc_container') {
         	$this->containerattributes = $this->addBloxAttributes('container',$this->containerattributes);
         }
@@ -60,8 +60,6 @@ class blox {
         	include_once(strtr(realpath(dirname(__FILE__))."/cache.class.inc.php", '\\', '/'));
             $this->cache = new xetCache($bloxconfig);
 		}
-
-            
 
         if (class_exists('xetCache')) {
             
@@ -117,7 +115,7 @@ class blox {
             return;
         }
 		
-        $this->bloxconfig['parents'] = $this->bloxconfig['parents'] !== ''?$this->bloxconfig['parents']:$modx->documentIdentifier;
+        $this->bloxconfig['parents'] = $this->bloxconfig['parents'] !== ''?$this->bloxconfig['parents']:$modx->resource->get('id');
 		
 		$parents = explode(',', $this->bloxconfig['parents']);
         $depth = $this->bloxconfig['depth'];   
@@ -286,13 +284,6 @@ class blox {
 
     function getDocColumnNames() {
         global $modx;
-        $table = $modx->getFullTableName('site_content');
-        $result = $modx->db->select('*', $table, '');
-        $this->docColumnNames = $modx->db->getColumnNames($result);
-        return;
-    }
-    function getDocColumnNamesRevo() {
-        global $modx;
         $fields = $modx->getFields('modResource');
         $this->docColumnNames=array();
         foreach ($fields as $key=>$field) {
@@ -338,14 +329,16 @@ class blox {
     function displaydatas($outerdata = array ()) {
         global $modx;
 
+//$outerdata['innerrows']['row']='innerrows.row';
+        $start=time();
         $this->regSnippetScriptsAndCSS();
         $cache = $outerdata['cacheaction'];
         $cachename = $outerdata['cachename'];
         if ($cache == '2') {
-            return $outerdata['cacheoutput'];;
+            return $outerdata['cacheoutput'];
         }
 
-        $tpl = new xettChunkie($this->tpls['bloxouter']);
+        
         $bloxouterTplData = array ();
         $bloxinnerrows = array ();
 		$bloxinnercounts = array ();
@@ -355,6 +348,7 @@ class blox {
         }
 
         $innerrows = $outerdata['innerrows'];
+		unset($outerdata['innerrows']);
 
         if (count($innerrows) > 0) {
             foreach ($innerrows as $key=>$row) {
@@ -372,40 +366,38 @@ class blox {
 				
 				if ($innertpl !== ''){
                     $data=$this->renderdatarows($row,$innertpl,$key,$outerdata);
-                    $bloxinnerrows[$key] = $data;
+					$bloxinnerrows[$key] = $data;
 					$bloxinnercounts[$key] = count($row);
 				}
 
             }
         }
-        $tpl->addVar('innerrows',$bloxinnerrows);
-		$tpl->addVar('innercounts',$bloxinnercounts);
-        if (count($outerdata)>0) {
-            foreach($outerdata as $key=>$value) {
-                $tpl->addVar($key,$value);
-            }
-        }
-
+        $outerdata['innerrows']=$bloxinnerrows;
+		$outerdata['innercounts']=$bloxinnercounts;
         $bloxouterTplData['containerattributes'] = implode(' ',$this->containerattributes);
 
+/*
         $key='message';
         $tplfile = $this->bloxconfig['tplpath'] . "/" . $key . "Tpl.html";
         $innertpl=(file_exists($tplfile))?$innertpl="@FILE:".$tplfile:'';
         $row=$this->messages;
         $massagedata=$this->renderdatarows($row,$innertpl,$key);
-
         $bloxouterTplData['messages'] = $massagedata;
+*/
         $bloxouterTplData['row'] = $outerdata;
         $bloxouterTplData['config'] = $this->bloxconfig;		
 		$bloxouterTplData['containerclassnames'] = implode (' ',$this->containerclassnames);
-        $tpl->addVar('blox', $bloxouterTplData);
+        $outerdata['blox']=$bloxouterTplData;
 
-
+        $tpl = new xettChunkie($this->tpls['bloxouter']);
+		$tpl->placeholders=$outerdata;
         $daten = $tpl->Render();
+		unset ($tpl);
         if ($cache == '1') {
             $this->cache->writeCache($cachename, $daten);
         }
-
+        $end=time();
+		echo ($end-$start);       
         return $daten;
     }
     //////////////////////////////////////////////////
@@ -426,10 +418,138 @@ class blox {
         }
         return $output;
     }
+
     //////////////////////////////////////////////////
     //renderdatarow and custom-innerrows (bloxouterTpl)
     /////////////////////////////////////////////////
     function renderdatarow($row, $rowTpl = 'default',$rowkey='',$outerdata=array(),$rowscount,$iteration) {
+        global $modx;
+
+        $date = $this->date;
+
+        if ( isset ($row['tpl'])) {
+            $tplfilename = $this->bloxconfig['tplpath']."/".$row['tpl'];
+            if (($row['tpl'] !== '') && (file_exists($tplfilename))) {
+                $rowTpl = "@FILE:".$tplfilename;
+            }
+        }
+
+		if (substr($rowTpl,0,7) == '@FIELD:'){
+            $rowTpl=($row[substr($rowTpl,7)]);
+		}						
+
+        $datarowTplData = array ();
+        $bloxinnerrows = array ();
+		$bloxinnercounts = array ();
+        $innerrows = $row['innerrows'];
+		unset($row['innerrows']);
+
+        
+        if ((is_array($innerrows)) && (count($innerrows) > 0)) {
+            foreach ($innerrows as $key=>$innerrow) {
+ 				$daten = '';
+				$innertpl='';
+				if (isset($this->tpls[$key])){
+					$innertpl=$this->tpls[$key];
+				}
+				else{
+                $tplfile = $this->bloxconfig['tplpath'] . "/" . $key . "Tpl.html";
+                if (file_exists($modx->config['base_path'].$tplfile)) {
+                    $innertpl = "@FILE:" . $tplfile;
+                }					
+				}
+				if (isset($this->templates[$innertpl])||$innertpl !== ''){
+                    $data = $this->renderdatarows($innerrow, $innertpl, $key, $row);
+                    $datarowTplData['innerrows'][$key] = $data;
+                    $bloxinnerrows[$key] = $data;
+					$bloxinnercounts[$key] = count($innerrow);
+				}
+
+            }
+        }
+ 
+		if(count($bloxinnerrows)>0){
+		$row['innerrows']=$bloxinnerrows;
+		$row['innercounts']=$bloxinnercounts;			
+		}
+
+        if (count($row)>0) {
+            foreach($row as $field=>$value) {
+                if (!is_array($value)) {
+				
+					$outputvalue=$value;
+
+                    if ($this->bloxconfig['processTVs'] == '1' && $this->bloxconfig['resourceclass'] == 'modDocument' && in_array($field, $this->tvnames))
+                    
+                    {
+                        //$outputvalue = $modx->getTemplateVarOutput($field, $row['id']);
+                        //$outputvalue = $outputvalue[$field];
+                        //$resource = $modx->getObject('modResource', $row['id']);
+                        //$outputvalue = $resource->getTVValue($field);
+
+                        $tv = $modx->getObject('modTemplateVar', array ('name'=>$field));
+                        $outputvalue = $tv->renderOutput($row['id']);
+                    
+                    }
+					
+					$outputvalue=$value;
+					
+                    //$tpl->addVar($field,$outputvalue);
+					$row[$field]=$outputvalue;
+                    $fieldname=$field;
+                    if ($rowkey=='rowvalue') {
+                        $fieldname=$row['fieldname'];
+                    //$value=$row['value'];
+                    }
+                    $tag='##';
+                    //$tpl->addVar($tag.$field,$this->generateDivForXedit($row,$fieldname,$value,$tag,$bloxattributes));
+                    $row[$tag.$field]=$this->generateDivForXedit($row,$fieldname,$value,$tag,$bloxattributes);
+					$tag='#';
+                    //$tpl->addVar($tag.$field,$this->generateDivForXedit($row,$fieldname,$outputvalue,$tag,$bloxattributes));
+                    $row[$tag.$field]=$this->generateDivForXedit($row,$fieldname,$value,$tag,$bloxattributes);
+				}
+				else {
+					$row[$field]=$value;
+				}
+            }
+        }
+
+        $datarowTplData['parent'] = $outerdata;
+        $datarowTplData['event'] = $row;
+        $datarowTplData['date'] = $date;
+        $datarowTplData['row'] = $row;
+		$datarowTplData['rowscount'] = $rowscount;
+		$datarowTplData['iteration'] = $iteration;		
+		$datarowTplData['xcc_button'] = $this->xcc_button;
+        $datarowTplData['config'] = $this->bloxconfig;
+        $datarowTplData['userID'] = $this->bloxconfig['userID'];
+        //$tpl->addVar('blox', $datarowTplData);
+		$row['blox']=$datarowTplData;
+		//echo '<br/>'.$rowkey.':'.$row['rowvalue'].'---------------<br/>';
+		//print_r($row);		
+        //$tpl = new xettChunkie($rowTpl,& $this->templates);
+		$tpl = new xettChunkie($rowTpl);		
+        $tpl->placeholders=$row;
+		$output = $tpl->Render();
+		
+		if ($rowkey=='row'||$rowkey=='fieldnames'||($rowkey=='rowvalue'&&$row['value']=='test')){
+
+            //echo '<br/>'.$rowkey.':'.$row['rowvalue'].'---------------<br/>';
+			//echo $output = $tpl->Render();
+			
+		}
+		unset($tpl,$row);
+		
+		return $output;
+    }
+
+
+
+
+    //////////////////////////////////////////////////
+    //renderdatarow and custom-innerrows (bloxouterTpl)
+    /////////////////////////////////////////////////
+    function renderdatarow2($row, $rowTpl = 'default',$rowkey='',$outerdata=array(),$rowscount,$iteration) {
         global $modx;
 		
 		$cache = $row['cacheaction'];
@@ -461,11 +581,13 @@ class blox {
             $rowTpl=($row[substr($rowTpl,7)]);
 		}						
 		
-        $tpl = new xettChunkie($rowTpl,& $this->templates);
+        //$tpl = new xettChunkie($rowTpl,& $this->templates);
+		//$tpl = new xettChunkie($rowTpl);
         $datarowTplData = array ();
         $bloxinnerrows = array ();
 		$bloxinnercounts = array ();
         $innerrows = $row['innerrows'];
+		unset($row['innerrows']);
 /*
         if ((is_array($innerrows)) && (count($innerrows) > 0)) {
             foreach ($innerrows as $key=>$innerrow) {
@@ -503,10 +625,10 @@ class blox {
 
             }
         }
-
-        $tpl->addVar('innerrows',$bloxinnerrows);
-		$tpl->addVar('innercounts',$bloxinnercounts);
-
+        
+		
+		$row['innerrows']=$bloxinnerrows;
+		$row['innercounts']=$bloxinnercounts;
 
         if ($GLOBALS['xedit_runs'] == '1') {
             $bloxattributes = $this->addBloxAttributes('xedit_tabs,tablename,resourceclass,savemode');
@@ -535,24 +657,29 @@ class blox {
                 if (!is_array($value)) {
                 	
 					$outputvalue=$value;
+					
 					if ($this->bloxconfig['resourceclass']=='modDocument' && in_array($field,$this->tvnames)){
 						
 						$outputvalue=$modx->getTemplateVarOutput($field,$row['id']);
 						$outputvalue=$outputvalue[$field];
 					}
-                    $tpl->addVar($field,$outputvalue);
+					
+                    //$tpl->addVar($field,$outputvalue);
+					$row[$field]=$outputvalue;
                     $fieldname=$field;
                     if ($rowkey=='rowvalue') {
                         $fieldname=$row['fieldname'];
                     //$value=$row['value'];
                     }
                     $tag='##';
-                    $tpl->addVar($tag.$field,$this->generateDivForXedit($row,$fieldname,$value,$tag,$bloxattributes));
-                    $tag='#';
-                    $tpl->addVar($tag.$field,$this->generateDivForXedit($row,$fieldname,$outputvalue,$tag,$bloxattributes));
-                }
+                    //$tpl->addVar($tag.$field,$this->generateDivForXedit($row,$fieldname,$value,$tag,$bloxattributes));
+                    $row[$tag.$field]=$this->generateDivForXedit($row,$fieldname,$value,$tag,$bloxattributes);
+					$tag='#';
+                    //$tpl->addVar($tag.$field,$this->generateDivForXedit($row,$fieldname,$outputvalue,$tag,$bloxattributes));
+                    $row[$tag.$field]=$this->generateDivForXedit($row,$fieldname,$value,$tag,$bloxattributes);
+				}
 				else {
-					$tpl->addVar($field,$value);
+					$row[$field]=$value;
 				}
             }
         }
@@ -566,9 +693,14 @@ class blox {
 		$datarowTplData['xcc_button'] = $this->xcc_button;
         $datarowTplData['config'] = $this->bloxconfig;
         $datarowTplData['userID'] = $this->bloxconfig['userID'];
-        $tpl->addVar('blox', $datarowTplData);
+        //$tpl->addVar('blox', $datarowTplData);
+		$row['blox']=$datarowTplData;
 		//print_r($tpl);
-        $output = $tpl->Render();
+        //$tpl = new xettChunkie($rowTpl,& $this->templates);
+		$tpl = new xettChunkie($rowTpl);		
+        $tpl->placeholders=$row;
+		$output = $tpl->Render();
+		unset($tpl);
         if ($cache == '1') {
             $this->cache->writeCache($cachename, $output);
         }
@@ -1122,19 +1254,14 @@ class blox {
 		return $result;   	
     }
 
-    function checkXCCbuttons($rows){
+    function checkXCCbuttons($result){
         //add button arround this row for blox-creating
-        if ($this->bloxconfig['c_type'] == 'xcc_container'&& count($result)>0) {
-            $result=array();
-            foreach($rows as $row){
-                $row['makexccbutton']='1';
-                $result[]=$row;
-            }
-        }
-        else { 
-            return $rows; 
-        }
-        return $result;
+		if ($this->bloxconfig['c_type'] == 'xcc_container'&& count($result)>0){
+			foreach($result as & $row){
+				$row['makexccbutton']='1';
+			}
+		} 
+		return $result;   	
     }
 
     function gettablerows()
@@ -1182,8 +1309,10 @@ class blox {
         $this->totalCount = $modx->db->getRecordCount($rs);
 
         $rs = $modx->db->select($this->bloxconfig['distinct'].' '.$fields, $table, $where.$groupby, $orderBy, $start.', '.$perPage);
-        $this->columnNames = $modx->db->getColumnNames( $rs );	// Get column names - in the order you select them     
-        $rows = $modx->db->makeArray($rs);    
+        //$this->columnNames = $modx->db->getColumnNames( $rs );	// Get column names - in the order you select them     
+        $rows = $modx->db->makeArray($rs);
+		
+		$this->columnNames = array_keys($rows[0]);    
     
         return $rows;
 	
@@ -1327,17 +1456,22 @@ class blox {
                 $orderby ";
         // Get rows
         //echo $sql;
+
         $rs = $modx->db->query($sql);
         $this->totalCount = $modx->db->getRecordCount($rs);
+
         $sql .= $limit;
         $rs = $modx->db->query($sql);
-        $this->columnNames = $modx->db->getColumnNames($rs);
-    
-    
+	
+		//$this->columnNames = $modx->db->getColumnNames($sql);
+   
         $rows = $modx->db->makeArray($rs);
-    
+
+        $this->columnNames = array_keys($rows[0]);
         return $rows;
+		
     }
+
 
 
     /**
