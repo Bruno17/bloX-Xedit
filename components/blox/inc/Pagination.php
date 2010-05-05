@@ -95,7 +95,9 @@ class Pagination {
    */	
   function create_links()
   {
-  		global $modx;
+  		
+
+		global $modx;
 	    // If our item count or per-page total is zero there is no need to continue.
 		if ($this->total_rows == 0 OR $this->per_page == 0)
 		{
@@ -104,10 +106,8 @@ class Pagination {
 		// Calculate the total number of pages
 	 	$num_pages = ceil($this->total_rows / $this->per_page);
 		
-		$idInfo = $modx->getTemplateVar('id');
-		$curId = $idInfo['value'];
-		$aliasInfo = $modx->getTemplateVar('alias');
-		$curAlias = $aliasInfo['value'];
+		$curId = $modx->resource->get('id');
+		$curAlias = $modx->resource->get('alias');
 	         
 		if ( ! is_numeric($this->cur_item))
 		{
