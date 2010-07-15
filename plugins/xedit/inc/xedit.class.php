@@ -464,24 +464,24 @@ class xedit {
             if ( empty($mootools))
             {
                 $mootools = '
-    			<script src="/assets/plugins/xedit/js/mootools-1.2.3.js" type="text/javascript"></script>
-    			<script src="/assets/plugins/xedit/js/mootools-1.2.3.1-more.js" type="text/javascript"></script>	
+    			<script src="'.$app_url.'js/mootools-1.2.3.js" type="text/javascript"></script>
+    			<script src="'.$app_url.'js/mootools-1.2.3.1-more.js" type="text/javascript"></script>	
     			';
             }
     
             $filemanager = '
-    		<link rel="stylesheet" media="all" type="text/css" href="/assets/plugins/xedit/inc/FileManager/Css/FileManager.css" />
-    		<link rel="stylesheet" media="all" type="text/css" href="/assets/plugins/xedit/inc/FileManager/Css/Additions.css" />
-    		<script type="text/javascript" src="/assets/plugins/xedit/inc/FileManager/Source/FileManager.js"></script>
-    		<script type="text/javascript" src="/assets/plugins/xedit/inc/FileManager/Source/Language/Language.en.js"></script>
-    		<script type="text/javascript" src="/assets/plugins/xedit/inc/FileManager/Source/Language/Language.de.js"></script>
-    		<script type="text/javascript" src="/assets/plugins/xedit/inc/FileManager/Source/Additions.js"></script>
+    		<link rel="stylesheet" media="all" type="text/css" href="'.$app_url.'inc/FileManager/Css/FileManager.css" />
+    		<link rel="stylesheet" media="all" type="text/css" href="'.$app_url.'inc/FileManager/Css/Additions.css" />
+    		<script type="text/javascript" src="'.$app_url.'inc/FileManager/Source/FileManager.js"></script>
+    		<script type="text/javascript" src="'.$app_url.'inc/FileManager/Source/Language/Language.en.js"></script>
+    		<script type="text/javascript" src="'.$app_url.'inc/FileManager/Source/Language/Language.de.js"></script>
+    		<script type="text/javascript" src="'.$app_url.'inc/FileManager/Source/Additions.js"></script>
     	
-    		<script type="text/javascript" src="/assets/plugins/xedit/inc/FileManager/Source/Uploader/Fx.ProgressBar.js"></script>
-    		<script type="text/javascript" src="/assets/plugins/xedit/inc/FileManager/Source/Uploader/Swiff.Uploader.js"></script>
+    		<script type="text/javascript" src="'.$app_url.'inc/FileManager/Source/Uploader/Fx.ProgressBar.js"></script>
+    		<script type="text/javascript" src="'.$app_url.'inc/FileManager/Source/Uploader/Swiff.Uploader.js"></script>
     
-    		<script type="text/javascript" src="/assets/plugins/xedit/inc/FileManager/Source/Uploader.js"></script>
-    		<script type="text/javascript" src="/assets/plugins/xedit/inc/FileManager/Source/Gallery.js"></script>
+    		<script type="text/javascript" src="'.$app_url.'inc/FileManager/Source/Uploader.js"></script>
+    		<script type="text/javascript" src="'.$app_url.'inc/FileManager/Source/Gallery.js"></script>
     		';
     
     

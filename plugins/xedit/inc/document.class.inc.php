@@ -1,4 +1,4 @@
-<?
+<?php
 /***************************************************************
   Name: Docmanager
   Description: Class for editing/creating/duplicating/deleting documents
@@ -13,7 +13,7 @@
 	$doc->Set('alias','post'.time());
 	$doc->Set('content','document content');
 	$doc->Set('template','GuestBookComments');
-	$doc->Set('tvComment','post to comment');
+	$doc->Set('tvComment','post to comment'); 
 	$doc->Save();
 	
   Area of use:
