@@ -11,6 +11,7 @@ class blox {
         global $modx;
         $this->bloxID = $bloxconfig['id'];
         $this->bloxconfig = $bloxconfig;
+		$this->bloxconfig['prefilter']='';
         $this->columnNames = array();
 		$this->tvnames          = array();
         $this->docColumnNames   = array();
@@ -94,13 +95,13 @@ class blox {
 		if ($this->bloxconfig['resourceclass']=='modDocument'){
 		if ($this->bloxconfig['showdeleted']=='0' ||$this->bloxconfig['showdeleted']=='0'){
             $filter = 'deleted|'.$this->bloxconfig['showdeleted'].'|=';				
-			$this->bloxconfig['filter'] = ! empty($this->bloxconfig['filter'])?$filter.'++'.$this->bloxconfig['filter']:$filter;	
+			$this->bloxconfig['prefilter'] = ! empty($this->bloxconfig['prefilter'])?$filter.'++'.$this->bloxconfig['prefilter']:$filter;	
 		}
 
 		if ($this->bloxconfig['showunpublished']=='0' ||$this->bloxconfig['showunpublished']=='2'){
             
 			$filter = 'published|'.(($this->bloxconfig['showunpublished']=='0')?'1':'0').'|=';				
-			$this->bloxconfig['filter'] = ! empty($this->bloxconfig['filter'])?$filter.'++'.$this->bloxconfig['filter']:$filter;	
+			$this->bloxconfig['prefilter'] = ! empty($this->bloxconfig['prefilter'])?$filter.'++'.$this->bloxconfig['prefilter']:$filter;	
 		}					
 		}
    }
@@ -132,7 +133,7 @@ class blox {
 
             //$filter = 'id|'.implode(',', $ids).'|IN';
 			$filter = 'parent|'.implode(',', $parents).'|IN';
-            $this->bloxconfig['filter'] = ! empty($this->bloxconfig['filter'])?$filter.'++'.$this->bloxconfig['filter']:$filter;
+            $this->bloxconfig['prefilter'] = ! empty($this->bloxconfig['prefilter'])?$filter.'++'.$this->bloxconfig['prefilter']:$filter;
     }
 
    function getBloxfolder($parents){
@@ -155,7 +156,7 @@ class blox {
         {
         	$ids = $this->bloxconfig['IDs'];
             $filter = $this->bloxconfig['keyField'].'|'.$ids.'|IN';
-            $this->bloxconfig['filter'] = ! empty($this->bloxconfig['filter'])?$filter.'++'.$this->bloxconfig['filter']:$filter;
+            $this->bloxconfig['prefilter'] = ! empty($this->bloxconfig['prefilter'])?$filter.'++'.$this->bloxconfig['prefilter']:$filter;
         }
     
     }
@@ -397,7 +398,7 @@ class blox {
             $this->cache->writeCache($cachename, $daten);
         }
         $end=time();
-		echo ($end-$start);       
+		//echo ($end-$start);       
         return $daten;
     }
     //////////////////////////////////////////////////
@@ -492,7 +493,7 @@ class blox {
                     
                     }
 					
-					$outputvalue=$value;
+					//$outputvalue=$value;
 					
                     //$tpl->addVar($field,$outputvalue);
 					$row[$field]=$outputvalue;
@@ -1093,7 +1094,7 @@ class blox {
 
     }
 
-    function filter2sqlwhere($filters, $TVarray=array(), $resourceclass='modDocument') {
+    function filter2sqlwhere($filters, &$TVarray=array(), $resourceclass='modDocument',&$having='') {
 
     //$filter = 'pagetitle|der Titel|=++parent|25,30,40|IN++(rennennr|10|>||(published|1|=++deleted|0|=)++id|1,2,3,4,5|IN)||parent|25|=';
     //$where = '`pagetitle`="der Titel" AND `parent` IN (25,30,40) AND (`rennennr` > 10 OR `published` = 1 AND `deleted` = 0) OR `id` IN (1,2,3,4,5))';
@@ -1135,10 +1136,10 @@ class blox {
 
                 switch($filter) {
                     case '||':
-                        $where .= ' OR ';
+                        $andOr = ' OR ';
                         break;
                     case '++':
-                        $where .= ' AND ';
+                        $andOr = ' AND ';
                         break;
                         default:
                             $pieces = explode($delimiter, $filter);
@@ -1177,19 +1178,16 @@ class blox {
                                 default:
                                     break;
                             }
-		                        $field = $pieces[0];
-                                if ($resourceclass == 'modDocument' && in_array($field, $this->tvnames))
-                                {
-                                    $TVarray[] = $field;
-                                    //$field = $field.'_tvcv.`value`';
-									$field = " IF(".$field."_tvcv.value!='',".$field."_tvcv.value,".$field."_tv.default_text) "; 
-                                }
-                                else
-                                {
-                                    $field = $scipfield?'':$alias.'`'.$field.'`';
-                                }
-                           
-                            $where .= $o_bracket.$field.$pieces[2].$o_enc.$pieces[1].$c_enc.' '.$c_bracket;
+	                        $field = $pieces[0];
+                            if ($resourceclass == 'modDocument' && in_array($field, $this->tvnames))
+                            {
+                                $TVarray[$field] = $field;
+                                //$field = $field.'_tvcv.`value`';
+         						//$field = " IF(".$field."_tvcv.value!='',".$field."_tvcv.value,".$field."_tv.default_text) "; 
+                                $alias='';
+    						}
+		                    $field = $scipfield?'':$alias.'`'.$field.'`';
+                            $where .= $andOr.$o_bracket.$field.$pieces[2].$o_enc.$pieces[1].$c_enc.' '.$c_bracket;
                         }
                         break;
                 }
@@ -1278,7 +1276,7 @@ class blox {
         $numLinks = $this->bloxconfig['numLinks'];
         $fields = $this->bloxconfig['fields'];
         $requiredFields = $this->bloxconfig['requiredFields'];
-		$filter = $this->bloxconfig['filter'];
+		$filter = $this->bloxconfig['prefilter']==''?$this->bloxconfig['filter']:$this->bloxconfig['prefilter'].'++'.$this->bloxconfig['filter'];
         $start = $pageStart-1;
         $limit = $start.', '.$perPage;
         $where = $this->filter2sqlwhere($filter,array(),$this->bloxconfig['resourceclass']);
@@ -1335,7 +1333,6 @@ class blox {
         $numLinks = $this->bloxconfig['numLinks'];
         $fields = $this->bloxconfig['fields'];
         $requiredFields = $this->bloxconfig['requiredFields'];
-		$filter = $this->bloxconfig['filter'];
         $start = $pageStart-1;
         $limit = $start.', '.$perPage;
     
@@ -1346,8 +1343,14 @@ class blox {
         $this->getTvNames();
         $this->getDocColumnNames();
         $Tvarray = array ();
-        $where = $this->filter2sqlwhere($filter, & $Tvarray);
+
+
+        $where = $this->filter2sqlwhere($this->bloxconfig['prefilter'], $Tvarray, 'modDocument');
         $where = $where !== ''?' AND '.$where:'';
+
+        $having = $this->filter2sqlwhere($this->bloxconfig['filter'], $Tvarray, 'modDocument');
+		$having = $having == ''?'':' HAVING '.$having.' ';
+		
     
         //echo $where;
         //
@@ -1364,19 +1367,11 @@ class blox {
         $matchTvJoins = '';
         $tvNames = '';
         $in_tvarray = array ();
-        if ($fields == '*')
-        {
-            $Fields = array ('sc.*');
-    
-        }
+        $Fields = array ('sc.*');
 
         foreach ($requiredFields as $field)
         {
-            if ($fields !== '*' && in_array($field, $this->docColumnNames))
-            {
-                $Fields[] = " sc.$field ";
-            }
-            elseif (in_array($field, $this->tvnames))
+            if (in_array($field, $this->tvnames))
             {
                 $in_tvarray[] = $field;
                 //$Fields[] = $field."_tvcv.value AS $field ";
@@ -1392,7 +1387,8 @@ class blox {
         {
             if (!in_array($field, $in_tvarray))
             {
-                $Froms[] = "$t_tv AS ".$field."_tv ";
+                $Fields[] = " IF(".$field."_tvcv.value!='',".$field."_tvcv.value,".$field."_tv.default_text) AS $field ";
+				$Froms[] = "$t_tv AS ".$field."_tv ";
                 $tvJoins .= " LEFT JOIN $t_cv AS ".$field."_tvcv ON ".$field."_tvcv.contentid = sc.id AND ".$field."_tvcv.tmplvarid = ".$field."_tv.id";
                 $tvNames .= " AND ".$field."_tv.name = '$field'";
             }
@@ -1452,10 +1448,11 @@ class blox {
                         WHERE 1
                 $tvNames
                 $where
-				$groupby        
+				$groupby 
+				$having       
                 $orderby ";
         // Get rows
-        //echo $sql;
+        //echo '<br/><br/>'. $sql;
 
         $rs = $modx->db->query($sql);
         $this->totalCount = $modx->db->getRecordCount($rs);
