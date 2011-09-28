@@ -145,7 +145,8 @@ class Pagination {
 		// Render the "First" link
 		if  ($this->curPage > $this->num_links)
 		{
-			$output .= $this->first_tag_open.'<a href="' . $modx->makeUrl($curId, '', 'pagestart=1') . '">'.$this->first_link.'</a>'.$this->first_tag_close;
+			$link['pagestart'] = '1';
+			$output .= $this->first_tag_open.'<a href="' . $this->smartModxUrl($curId,$curAlias, $link) . '">'.$this->first_link.'</a>'.$this->first_tag_close;
 		}
 
 		// Render the "previous" link
@@ -153,7 +154,8 @@ class Pagination {
 		{
 			$i = $this->cur_item - $this->per_page;
 			if ($i == 0) $i = '';
-			$output .= $this->prev_tag_open.'<a href="'. $modx->makeUrl($curId, '', 'pagestart=' . $i ) .'">'.$this->prev_link.'</a>'.$this->prev_tag_close;
+			$link['pagestart'] = $i;
+			$output .= $this->prev_tag_open.'<a href="'. $this->smartModxUrl($curId,$curAlias, $link) .'">'.$this->prev_link.'</a>'.$this->prev_tag_close;
 		}
 
 		// Write the digit links
@@ -170,7 +172,8 @@ class Pagination {
 				else
 				{
 					$n = ($i == 0) ? '' : $i;
-					$output .= $this->num_tag_open . '<a href="'. $modx->makeUrl($curId, '', 'pagestart=' . $n ) . '">' . $loop.'</a>'.$this->num_tag_close;
+					$link['pagestart'] = $n;
+					$output .= $this->num_tag_open . '<a href="'. $this->smartModxUrl($curId,$curAlias, $link) . '">' . $loop.'</a>'.$this->num_tag_close;
 				}
 			}
 		}
@@ -178,14 +181,16 @@ class Pagination {
 		// Render the "next" link
 		if ($this->curPage < $num_pages)
 		{
-			$output .= $this->next_tag_open . '<a href="'. $modx->makeUrl($curId, '', 'pagestart='  . ($this->curPage * $this->per_page + 1)) . '">' .$this->next_link.'</a>'.$this->next_tag_close;
+			$link['pagestart'] = ($this->curPage * $this->per_page + 1);
+			$output .= $this->next_tag_open . '<a href="'. $this->smartModxUrl($curId,$curAlias, $link) . '">' .$this->next_link.'</a>'.$this->next_tag_close;
 		}
 
 		// Render the "Last" link
 		if (($this->curPage + $this->num_links) < $num_pages)
 		{
 			$i = (($num_pages * $this->per_page) - $this->per_page + 1);
-			$output .= $this->last_tag_open . '<a href="'. $modx->makeUrl($curId, '', 'pagestart=' . $i) . '">' .  $this->last_link.'</a>'.$this->last_tag_close;
+			$link['pagestart'] = $i;
+			$output .= $this->last_tag_open . '<a href="'. $this->smartModxUrl($curId,$curAlias, $link) . '">' .  $this->last_link.'</a>'.$this->last_tag_close;
 		}
 
 		// Kill double slashes.  Note: Sometimes we can end up with a double slash
@@ -197,6 +202,32 @@ class Pagination {
 		
 		return $output;		
   }
+/*
+ * $link['page'] = 3;
+ * $link['aname'] = 'avalue';
+ * $link['another'] = 'one';
+ * echo smartModxUrl($modx->documentObject["id"],NULL, $link);
+ */
+
+function smartModxUrl($docid, $docalias, $array_values,$removearray=array()) {
+		global $modx;
+		$array_url = $_GET;
+		$urlstring = array();
+		
+		unset($array_url["id"]);
+		unset($array_url["q"]);
+		
+		$array_url = array_merge($array_url,$array_values);
+
+		foreach ($array_url as $name => $value) {
+			if (!is_null($value)&& !in_array($name,$removearray)) {
+			  $urlstring[] = $name . '=' . urlencode($value);
+			}
+		}
+		
+		return $modx->makeUrl($docid, $docalias, join('&',$urlstring));
+	}
 }
+
 // END Pagination Class
 ?>

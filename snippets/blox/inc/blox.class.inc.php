@@ -461,7 +461,7 @@ class blox {
             $rowTpl=($row[substr($rowTpl,7)]);
 		}						
 		
-        $tpl = new xettChunkie($rowTpl,& $this->templates);
+        $tpl = new xettChunkie($rowTpl, $this->templates);
         $datarowTplData = array ();
         $bloxinnerrows = array ();
 		$bloxinnercounts = array ();
@@ -961,7 +961,7 @@ class blox {
 
     }
 
-    function filter2sqlwhere($filters, $TVarray=array(), $resourceclass='modDocument') {
+    function filter2sqlwhere($filters,& $TVarray=array(), $resourceclass='modDocument') {
 
     //$filter = 'pagetitle|der Titel|=++parent|25,30,40|IN++(rennennr|10|>||(published|1|=++deleted|0|=)++id|1,2,3,4,5|IN)||parent|25|=';
     //$where = '`pagetitle`="der Titel" AND `parent` IN (25,30,40) AND (`rennennr` > 10 OR `published` = 1 AND `deleted` = 0) OR `id` IN (1,2,3,4,5))';
@@ -987,7 +987,8 @@ class blox {
 		$delimiter='|';
 
         foreach ($filterarray as $filter) {
-            if (! empty($filter)) {
+            $scipfield=false;
+			if (! empty($filter)) {
                 $filter = trim($filter);
                 $o_bracket = '';
                 $c_bracket = '';
@@ -1021,6 +1022,9 @@ class blox {
                                     $o_enc = '(';
                                     $c_enc = ')';
                                     break;
+                                case 'ne':
+                                    $pieces[2] = '<>';
+                                    break;									
                                 case 'eq':
                                     $pieces[2] = '=';
                                     break;
@@ -1030,18 +1034,13 @@ class blox {
                                 case 'lt':
                                     $pieces[2] = '<=';
                                     break;
-                                case 'ne':
-                                    $pieces[2] = '<>';
-                                    break;									
-                                /*
-								case 'isempty':
+                                case 'isempty':
 								case 'not isempty':
                                     $o_enc = '(';
                                     $c_enc = ')';
 									$pieces[1]=$pieces[0];
 									$scipfield=true;								
-                                    break;
-                                */    									
+                                    break;									
                                 default:
                                     break;
                             }
@@ -1156,7 +1155,8 @@ class blox {
         $limit = $start.', '.$perPage;
         $where = $this->filter2sqlwhere($filter,array(),$this->bloxconfig['resourceclass']);
 		//$where = $where !== ''?' AND '.$where:'';
-        $table = $modx->getFullTablename($this->bloxconfig['tablename']);
+        
+		$table = $this->bloxconfig['tableprefix'].$this->bloxconfig['tablename'];
        
 		
         /*
@@ -1217,7 +1217,7 @@ class blox {
         $this->getTvNames();
         $this->getDocColumnNames();
         $Tvarray = array ();
-        $where = $this->filter2sqlwhere($filter, & $Tvarray);
+        $where = $this->filter2sqlwhere($filter, $Tvarray);
         $where = $where !== ''?' AND '.$where:'';
     
         //echo $where;
@@ -1330,6 +1330,7 @@ class blox {
         $rs = $modx->db->query($sql);
         $this->totalCount = $modx->db->getRecordCount($rs);
         $sql .= $limit;
+        //echo $sql;
         $rs = $modx->db->query($sql);
         $this->columnNames = $modx->db->getColumnNames($rs);
     
@@ -1452,7 +1453,7 @@ function smartModxUrl($docid, $docalias, $array_values,$removearray=array()) {
 		}
 		
 		return $modx->makeUrl($docid, $docalias, join('&',$urlstring));
-	}
+	} 
 
 	// ---------------------------------------------------
 	// Function: getChildIDs
