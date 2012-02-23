@@ -154,7 +154,26 @@ $bloxconfig['trashbtn']=(isset($trashbtn))?$trashbtn:'0';
 $bloxconfig['savebtn']=(isset($savebtn))?$savebtn:'1';
 $bloxconfig['removebtn']=(isset($removebtn))?$removebtn:'0';
 
-
+// filter config addition:
+$filterparam = (isset($filterparam)) ? $filterparam : 'blox_filter';
+$filteroverwrite = (isset($filteroverwrite) && $filteroverwrite) ? TRUE : FALSE;
+if (isset($filtertype)) {
+	switch ($filtertype) {
+		case 'request' : {
+			$filter = (isset($_REQUEST[$filterparam])) ? $_REQUEST[$filterparam] : '';
+			break;
+		}
+		case 'get' : {
+			$filter = (isset($_GET[$filterparam])) ? $_GET[$filterparam] : '';
+			break;
+		}
+		case 'post' : {
+			$filter = (isset($_POST[$filterparam])) ? $_POST[$filterparam] : '';
+			break;
+		}
+	}
+	$bloxconfig['filter'] = (!$filteroverwrite && $bloxconfig['filter'] != '') ? $bloxconfig['filter'].'++'.$filter : $filter;
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //-------------------------------------------------------------------------------------------------
