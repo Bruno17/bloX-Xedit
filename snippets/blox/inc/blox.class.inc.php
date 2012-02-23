@@ -1153,7 +1153,8 @@ class blox {
 		$filter = $this->bloxconfig['filter'];
         $start = $pageStart-1;
         $limit = $start.', '.$perPage;
-        $where = $this->filter2sqlwhere($filter,array(),$this->bloxconfig['resourceclass']);
+        $TVarray = array();
+        $where = $this->filter2sqlwhere($filter,$TVarray,$this->bloxconfig['resourceclass']);
 		//$where = $where !== ''?' AND '.$where:'';
         
 		$table = $this->bloxconfig['tableprefix'].$this->bloxconfig['tablename'];
@@ -1177,6 +1178,12 @@ class blox {
                 $tvNames .= " AND ".$field."_tv.name = '$field'";
             }
         }
+        */
+        /*
+        $debug['table']=$table;
+        $debug['fields']=$fields;
+        $debug['where']=$where;
+        echo '<pre>'.print_r($debug,1).'</pre>';
         */
         $rs = $modx->db->select($this->bloxconfig['distinct'].' '.$fields, $table, $where.$groupby);
         $this->totalCount = $modx->db->getRecordCount($rs);

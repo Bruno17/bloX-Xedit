@@ -54,6 +54,7 @@ $bloxconfig['id'] = isset($id) ? $id : ''; // [ string ]
 $bloxconfig['id_'] = isset($id) ? $id.'_' : ''; // [ string ]
 $bloxconfig['distinct'] = isset($distinct)&&$distinct=='0' ? '' : 'distinct'; // 1 or 0 [ string ]
 $bloxconfig['projectname']=(isset($project))?$project:'blox';
+$bloxconfig['tableprefix']=(isset($tableprefix))?$tableprefix:$modx->dbConfig['table_prefix'];
 $bloxconfig['tablename']=(isset($tablename))?$tablename:'';
 $bloxconfig['resourceclass']=($bloxconfig['tablename']!=='')?'modTable':'modDocument';
 $bloxconfig['resourceclass']=(isset($resourceclass))?$resourceclass:$bloxconfig['resourceclass'];
