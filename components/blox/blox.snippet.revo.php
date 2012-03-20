@@ -32,7 +32,7 @@
  */
 
 // Path where bloX is installed
-$bloxpath='assets/components/blox/';
+$bloxpath='core/components/blox/';
 $GLOBALS['blox_path']=$bloxpath;
 //include snippet file
 $output = "";

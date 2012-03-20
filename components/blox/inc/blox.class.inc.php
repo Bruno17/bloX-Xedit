@@ -988,7 +988,7 @@ class blox {
             return true;
         } else {
             $webgroups = explode(',', $groups);
-            if ($modx->isMemberOfWebGroup($webgroups)) {
+            if ($modx->user->isMember($webgroups)) {
                 return true;
             } else {
                 return false;
