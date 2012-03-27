@@ -49,6 +49,7 @@ if (file_exists($adodbFile)) {
 	include_once($adodbFile);
 }
 
+$bloxconfig['scriptProperties']=$scriptProperties;
 $bloxconfig['id'] = isset($id) ? $id : ''; // [ string ]
 $bloxconfig['id_'] = isset($id) ? $id.'_' : ''; // [ string ]
 $bloxconfig['distinct'] = isset($distinct)&&$distinct=='0' ? '' : 'distinct'; // 1 or 0 [ string ]
