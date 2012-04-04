@@ -23,11 +23,12 @@
  */
 class Pagination {
 
-	var $base_url			= ''; // The page we are linking to
+	var $base_id            = ''; // The id of the page we are linking to
+	var $base_params        = ''; // further URL params
 	var $total_rows  		= ''; // Total number of items (database results)
 	var $per_page	 		= 10; // Max number of items you want shown per page
-	var $num_links			=  2; // Number of "digit" links to show before/after the currently viewed page
-	var $cur_item 			= 	1;
+	var $num_links			= 2; // Number of "digit" links to show before/after the currently viewed page
+	var $cur_item 			= 1;
 	var $first_link   		= '&lsaquo; First';
 	var $next_link			= '&gt;';
 	var $prev_link			= '&lt;';
@@ -106,9 +107,14 @@ class Pagination {
 		// Calculate the total number of pages
 	 	$num_pages = ceil($this->total_rows / $this->per_page);
 		
-		$curId = $modx->resource->get('id');
-		$curAlias = $modx->resource->get('alias');
-	         
+		$curId = ($this->base_id == '') ? $modx->resource->get('id') : $this->base_id;
+
+		if (!is_array($this->base_params) && $this->base_params != '') {
+			parse_str($this->base_params);
+		} else {
+			$this->base_params = array();
+		}
+
 		if ( ! is_numeric($this->cur_item))
 		{
 			$this->cur_item = 1;
@@ -128,9 +134,7 @@ class Pagination {
 		{
 			$this->cur_item = ($num_pages - 1) * $this->per_page;
 		}
-    
-    
-	 	$uri_page_number = $this->cur_item;
+
 		$this->curPage = floor(($this->cur_item/$this->per_page) + 1);
 
 		
@@ -145,15 +149,16 @@ class Pagination {
 		// Render the "First" link
 		if  ($this->curPage > $this->num_links)
 		{
-			$output .= $this->first_tag_open.'<a href="' . $modx->makeUrl($curId, $curAlias, 'pagestart=1') . '">'.$this->first_link.'</a>'.$this->first_tag_close;
+			$curParams = array_merge($this->base_params, array('pagestart' => 1));
+			$output .= $this->first_tag_open.'<a href="' . $modx->makeUrl($curId, '', $curParams) . '">'.$this->first_link.'</a>'.$this->first_tag_close;
 		}
 
 		// Render the "previous" link
 		if  (($this->curPage - $this->num_links) >= 0)
 		{
 			$i = $this->cur_item - $this->per_page;
-			if ($i == 0) $i = '';
-			$output .= $this->prev_tag_open.'<a href="'. $modx->makeUrl($curId, $curAlias, 'pagestart=' . $i ) .'">'.$this->prev_link.'</a>'.$this->prev_tag_close;
+			$curParams = ($i == 0) ? $this->base_params : array_merge($this->base_params, array('pagestart' => $i));
+			$output .= $this->prev_tag_open.'<a href="'. $modx->makeUrl($curId, '', $curParams) .'">'.$this->prev_link.'</a>'.$this->prev_tag_close;
 		}
 
 		// Write the digit links
@@ -169,8 +174,8 @@ class Pagination {
 				}
 				else
 				{
-					$n = ($i == 0) ? '' : $i;
-					$output .= $this->num_tag_open . '<a href="'. $modx->makeUrl($curId, $curAlias, 'pagestart=' . $n ) . '">' . $loop.'</a>'.$this->num_tag_close;
+					$curParams = ($i == 0) ? $this->base_params : array_merge($this->base_params, array('pagestart' => $i));
+					$output .= $this->num_tag_open . '<a href="'. $modx->makeUrl($curId, '', $curParams) . '">' . $loop.'</a>'.$this->num_tag_close;
 				}
 			}
 		}
@@ -178,14 +183,16 @@ class Pagination {
 		// Render the "next" link
 		if ($this->curPage < $num_pages)
 		{
-			$output .= $this->next_tag_open . '<a href="'. $modx->makeUrl($curId, $curAlias, 'pagestart='  . ($this->curPage * $this->per_page + 1)) . '">' .$this->next_link.'</a>'.$this->next_tag_close;
+			$curParams = array_merge($this->base_params, array('pagestart' => ($this->curPage * $this->per_page + 1)));
+			$output .= $this->next_tag_open . '<a href="'. $modx->makeUrl($curId, '', $curParams) . '">' .$this->next_link.'</a>'.$this->next_tag_close;
 		}
 
 		// Render the "Last" link
 		if (($this->curPage + $this->num_links) < $num_pages)
 		{
 			$i = (($num_pages * $this->per_page) - $this->per_page + 1);
-			$output .= $this->last_tag_open . '<a href="'. $modx->makeUrl($curId, $curAlias, 'pagestart=' . $i) . '">' .  $this->last_link.'</a>'.$this->last_tag_close;
+			$curParams = array_merge($this->base_params, array('pagestart' => $i));
+			$output .= $this->last_tag_open . '<a href="'. $modx->makeUrl($curId, '', $curParams) . '">' .  $this->last_link.'</a>'.$this->last_tag_close;
 		}
 
 		// Kill double slashes.  Note: Sometimes we can end up with a double slash
