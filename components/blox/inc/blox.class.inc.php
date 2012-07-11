@@ -7,7 +7,7 @@ class blox {
     //
     // Constructor class
     //
-    function blox($bloxconfig,$bloxtpl) {
+    function blox($bloxconfig) {
         global $modx;
         $this->bloxID = $bloxconfig['id'];
         $this->bloxconfig = $bloxconfig;
@@ -304,7 +304,7 @@ class blox {
         $keys = explode(',', $keys);
         if (count($keys) > 0) {
             foreach ($keys as $key) {
-                if ($this->bloxconfig[$key] !== '') {
+                if (isset($this->bloxconfig[$key]) && $this->bloxconfig[$key] !== '') {
                     $attributes = $this->addAttribute($key,$this->bloxconfig[$key],$attributes);
                 }
 
@@ -333,8 +333,8 @@ class blox {
 //$outerdata['innerrows']['row']='innerrows.row';
         $start=time();
         $this->regSnippetScriptsAndCSS();
-        $cache = $outerdata['cacheaction'];
-        $cachename = $outerdata['cachename'];
+        $cache = $modx->getOption('cacheaction',$outerdata,'');
+        $cachename = $modx->getOption('cachename',$outerdata,'');
         if ($cache == '2') {
             return $outerdata['cacheoutput'];
         }
@@ -344,11 +344,12 @@ class blox {
         $bloxinnerrows = array ();
 		$bloxinnercounts = array ();
 
-        if ($GLOBALS['xedit_runs'] == '1'){
+        $xeditruns = $modx->getOption('xedit_runs',$GLOBALS,'0'); 
+        if ($xeditruns == '1'){
         	$outerdata['innerrows']['bloxdummy'][]=array('caption'=>'Dummy');	
         }
 
-        $innerrows = $outerdata['innerrows'];
+        $innerrows = $modx->getOption('innerrows',$outerdata,array());
 		unset($outerdata['innerrows']);
 
         if (count($innerrows) > 0) {
@@ -442,7 +443,7 @@ class blox {
         $datarowTplData = array ();
         $bloxinnerrows = array ();
 		$bloxinnercounts = array ();
-        $innerrows = $row['innerrows'];
+        $innerrows = $modx->getOption('innerrows',$row,'');
 		unset($row['innerrows']);
 
         
@@ -504,10 +505,10 @@ class blox {
                     }
                     $tag='##';
                     //$tpl->addVar($tag.$field,$this->generateDivForXedit($row,$fieldname,$value,$tag,$bloxattributes));
-                    $row[$tag.$field]=$this->generateDivForXedit($row,$fieldname,$value,$tag,$bloxattributes);
+                    $row[$tag.$field]=$this->generateDivForXedit($row,$fieldname,$value,$tag);
 					$tag='#';
                     //$tpl->addVar($tag.$field,$this->generateDivForXedit($row,$fieldname,$outputvalue,$tag,$bloxattributes));
-                    $row[$tag.$field]=$this->generateDivForXedit($row,$fieldname,$value,$tag,$bloxattributes);
+                    $row[$tag.$field]=$this->generateDivForXedit($row,$fieldname,$value,$tag);
 				}
 				else {
 					$row[$field]=$value;
@@ -743,9 +744,11 @@ class blox {
 		return $output;
     }
 
-    function generateDivForXedit($row, $fieldname, $value, $tag, $bloxattributes) {
+    function generateDivForXedit($row, $fieldname, $value, $tag, $bloxattributes=array()) {
         $div_content = $value;
-        if ($GLOBALS['xedit_runs'] == '1' && $fieldname!==$this->bloxconfig['keyField']) {
+        global $modx;
+        $xeditruns = $modx->getOption('xedit_runs',$GLOBALS,'0');
+        if ($xeditruns == '1' && $fieldname!==$this->bloxconfig['keyField']) {
 
         //TODO:  Feldattribute (tablename,resourceclass,rowid) individuell pro Feld überschreiben
         //$bloxattributes = $this->addAttribute('rowid',$row[$this->bloxconfig['keyField']],$bloxattributes);
@@ -829,8 +832,7 @@ class blox {
     //////////////////////////////////////////////////////
     function getdatas($date,$file,$row=array()) {
         global $modx;
-        $scriptProperties = $this->bloxconfig['scriptProperties'];
-        $config = $this->bloxconfig['userID'];
+
         $file=$modx->config['base_path'].$file;
         if ($date == 'dayisempty') {
             $bloxdatas = array ();
@@ -958,7 +960,7 @@ class blox {
     ////////////////////////////////////////////////////////////////////
     function regSnippetScriptsAndCSS() {
         global $modx;
-        if ($this->bloxconfig['css'] != "") {
+        if (isset($this->bloxconfig['css']) && $this->bloxconfig['css'] != "") {
             if ($modx->getChunk($this->bloxconfig['css']) != "") {
                 $modx->regClientCSS($modx->getChunk($this->bloxconfig['css']));
             } else
@@ -968,7 +970,7 @@ class blox {
                     $modx->regClientCSS($this->bloxconfig['css']);
                 }
         }
-        if ($this->bloxconfig['js'] != "") {
+        if (isset($this->bloxconfig['js']) && $this->bloxconfig['js'] != "") {
             if ($modx->getChunk($this->bloxconfig['js']) != "") {
                 $modx->regClientStartupScript($modx->getChunk($this->bloxconfig['js']));
             } else
@@ -1095,7 +1097,8 @@ class blox {
 
     }
 
-    function filter2sqlwhere($filters, &$TVarray=array(), $resourceclass='modDocument',&$having='') {
+    function filter2sqlwhere($filters, $TVarray=array(), $resourceclass='modDocument',$having='') {
+
 
     //$filter = 'pagetitle|der Titel|=++parent|25,30,40|IN++(rennennr|10|>||(published|1|=++deleted|0|=)++id|1,2,3,4,5|IN)||parent|25|=';
     //$where = '`pagetitle`="der Titel" AND `parent` IN (25,30,40) AND (`rennennr` > 10 OR `published` = 1 AND `deleted` = 0) OR `id` IN (1,2,3,4,5))';

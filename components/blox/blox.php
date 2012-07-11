@@ -49,7 +49,6 @@ if (file_exists($adodbFile)) {
 	include_once($adodbFile);
 }
 
-$bloxconfig['scriptProperties']=$scriptProperties;
 $bloxconfig['id'] = isset($id) ? $id : ''; // [ string ]
 $bloxconfig['id_'] = isset($id) ? $id.'_' : ''; // [ string ]
 $bloxconfig['distinct'] = isset($distinct)&&$distinct=='0' ? '' : 'distinct'; // 1 or 0 [ string ]
@@ -167,7 +166,7 @@ $bloxconfig['removebtn']=(isset($removebtn))?$removebtn:'0';
 foreach ($includes as $includeclass)
 {
 if (!class_exists($includeclass)) {
-	$includefile=$basepath.$bloxpath.'inc/'.$includeclass.'.class.inc.php';
+	$includefile=$basePath.$bloxpath.'inc/'.$includeclass.'.class.inc.php';
 	if(file_exists($includefile)){
 		include_once($includefile);
 	} else {
@@ -182,7 +181,7 @@ switch($includeclass)
         // Initialize class
         if (class_exists($includeclass))
         {
-            $blox = new blox($bloxconfig, $bloxtpl);
+            $blox = new blox($bloxconfig);
         } else
         {
             $output = $includeclass.' class not found';
@@ -225,7 +224,7 @@ if (class_exists('xettcal')) {
 */
 
 if (!class_exists('xettChunkie')) {
-	$chunkieclass = $basepath.$bloxpath.'chunkie/chunkie.class.inc.php';
+	$chunkieclass = $basePath.$bloxpath.'chunkie/chunkie.class.inc.php';
 	if (file_exists($chunkieclass)) {
 		include_once $chunkieclass;
 	} else {
