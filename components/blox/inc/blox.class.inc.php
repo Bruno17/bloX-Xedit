@@ -832,7 +832,7 @@ class blox {
     //////////////////////////////////////////////////////
     function getdatas($date,$file,$row=array()) {
         global $modx;
-
+        $scriptProperties = $this->bloxconfig['scriptProperties'];
         $file=$modx->config['base_path'].$file;
         if ($date == 'dayisempty') {
             $bloxdatas = array ();
