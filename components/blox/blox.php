@@ -20,7 +20,7 @@ $basePath = $modx->getOption('base_path');
  */
 
 
-global $modx;
+//global $modx;
 //Include adodb-time.inc.php
 
 $bloxpath=$GLOBALS['blox_path'];

@@ -1,278 +1,374 @@
 <?php
-class blox {
-// Declaring private variables 
+
+class blox
+{
+    // Declaring private variables
     var $bloxconfig;
     var $bloxtpl;
 
     //
     // Constructor class
     //
-    function blox($bloxconfig) {
+    function blox($bloxconfig)
+    {
         global $modx;
+
         $this->bloxID = $bloxconfig['id'];
         $this->bloxconfig = $bloxconfig;
-		$this->bloxconfig['prefilter']='';
+        $this->bloxconfig['prefilter'] = '';
         $this->columnNames = array();
-		$this->tvnames          = array();
-        $this->docColumnNames   = array();
-        $this->tvids            = array();
+        $this->tvnames = array();
+        $this->docColumnNames = array();
+        $this->tvids = array();
         $this->checkfilter();
         $this->bloxconfig['parents'] = $this->cleanIDs($bloxconfig['parents']);
-		$this->bloxconfig['IDs'] = $this->cleanIDs($bloxconfig['IDs']);
-		
-		$this->xcc_button = array();
-		$this->containerclassnames['containerclass']='bloxcontainer';
-		$this->containerclassnames['rmclass']='';
-		$this->containerclassnames['fillclass']='fillable_'.$bloxconfig['fillable'];
-		$this->containerclassnames['saveclass']='';
+        $this->bloxconfig['IDs'] = $this->cleanIDs($bloxconfig['IDs']);
+
+        /*
+        $this->xcc_button = array();
+        $this->containerclassnames['containerclass'] = 'bloxcontainer';
+        $this->containerclassnames['rmclass'] = '';
+        $this->containerclassnames['fillclass'] = 'fillable_' . $bloxconfig['fillable'];
+        $this->containerclassnames['saveclass'] = '';
 
         $this->checkparents();
-		$this->checkIDs();		
-		$this->checkContainerType();
-		$this->checkRequiredFields();
-		//bloxcontainer 
-	 
-        $this->containerattributes=$this->addBloxAttributes('id,xedit_tabs,tablename,resourceclass,saveable,c_type,c_parentid',$attributes=array());
-        $this->containerattributes = $this->addAttribute('sender_id',$modx->resource->get('id'),$this->containerattributes);
+        $this->checkIDs();
+        $this->checkContainerType();
+        $this->checkRequiredFields();
+        //bloxcontainer
+        
+        $this->containerattributes = $this->addBloxAttributes('id,xedit_tabs,tablename,resourceclass,saveable,c_type,c_parentid', $attributes = array());
+        $this->containerattributes = $this->addAttribute('sender_id', $modx->resource->get('id'), $this->containerattributes);
         if ($this->bloxconfig['c_type'] == 'xcc_container') {
-        	$this->containerattributes = $this->addBloxAttributes('container',$this->containerattributes);
+        $this->containerattributes = $this->addBloxAttributes('container', $this->containerattributes);
         }
-        if (!empty($this->bloxconfig['documentsTv']) ) {
-        	$this->containerclassnames['ref_container']='ref_container';
-        	$this->containerattributes = $this->addBloxAttributes('documentsTv',$this->containerattributes);
-            $this->bloxconfig['removebtn']='1';
-		}
-        if (!empty($this->bloxconfig['orderByField']) ) {
-        	$this->containerattributes = $this->addBloxAttributes('orderByField',$this->containerattributes);
-		}						
-		//$this->generateContainerAttributes();
+        if (!empty($this->bloxconfig['documentsTv'])) {
+        $this->containerclassnames['ref_container'] = 'ref_container';
+        $this->containerattributes = $this->addBloxAttributes('documentsTv', $this->containerattributes);
+        $this->bloxconfig['removebtn'] = '1';
+        }
+        if (!empty($this->bloxconfig['orderByField'])) {
+        $this->containerattributes = $this->addBloxAttributes('orderByField', $this->containerattributes);
+        }
+        */
+        //$this->generateContainerAttributes();
         $this->tpls = array();
         //$GLOBALS['xetconfig']=$xetconfig;
         //$this->bloxtpl = array();
-		$this->checktpls();
-		
-        $this->renderdepth=0;
+        $this->checktpls();
+
+        $this->renderdepth = 0;
         $this->eventscount = array();
         //$this->innerdatas = array();
-        $this->output='';
+        $this->output = '';
         $this->date = xetadodb_mktime(0, 0, 0, $this->bloxconfig['month'], $this->bloxconfig['day'], $this->bloxconfig['year']);
+    }
 
-        if (!class_exists("xetCache")) {
-        	include_once(strtr(realpath(dirname(__FILE__))."/cache.class.inc.php", '\\', '/'));
-            $this->cache = new xetCache($bloxconfig);
-		}
+    function checktpls()
+    {
+        //example: &tpls=`bloxouter:myouter||row:contentonly`
 
-        if (class_exists('xetCache')) {
-            
-        } else {
-        //$output =  'xettcal class not found';
-        //return;
+        $this->tpls['bloxouter'] = "@FILE:" . $this->bloxconfig['tplpath'] . "/bloxouterTpl.html"; // [ path | chunkname | text ]
+        if ($this->bloxconfig['tpls'] !== '') {
+            $tpls = explode('||', $this->bloxconfig['tpls']);
+            foreach ($tpls as $tpl) {
+                //$tpl=explode(':',$tpl);
+                //$this->tpls[$tpl[0]]=$tpl[1];
+                $this->tpls[substr($tpl, 0, strpos($tpl, ':'))] = substr($tpl, strpos($tpl, ':') + 1);
+                //Todo: check if chunk exists
+            }
         }
 
-        include_once(strtr(realpath(dirname(__FILE__))."/formElements.class.inc.php", '\\', '/'));
-        $this->fe= new bloxFormElements();
     }
 
-  function checktpls(){
-  	//example: &tpls=`bloxouter:myouter||row:contentonly`
-	
-	$this->tpls['bloxouter']= "@FILE:".$this->bloxconfig['tplpath']."/bloxouterTpl.html"; // [ path | chunkname | text ]
-    if ($this->bloxconfig['tpls'] !== ''){
-    	$tpls=explode('||',$this->bloxconfig['tpls']);
-		foreach ($tpls as $tpl){
-			//$tpl=explode(':',$tpl);
-			//$this->tpls[$tpl[0]]=$tpl[1];
-			$this->tpls[substr($tpl,0,strpos($tpl,':'))]=substr($tpl,strpos($tpl,':')+1);
-			//Todo: check if chunk exists
-		}
+
+    function checkfilter()
+    {
+
+        if ($this->bloxconfig['resourceclass'] == 'modDocument') {
+            if ($this->bloxconfig['showdeleted'] == '0' || $this->bloxconfig['showdeleted'] == '0') {
+                $filter = 'deleted|' . $this->bloxconfig['showdeleted'] . '|=';
+                $this->bloxconfig['prefilter'] = !empty($this->bloxconfig['prefilter']) ? $filter . '++' . $this->bloxconfig['prefilter'] : $filter;
+            }
+
+            if ($this->bloxconfig['showunpublished'] == '0' || $this->bloxconfig['showunpublished'] == '2') {
+
+                $filter = 'published|' . (($this->bloxconfig['showunpublished'] == '0') ? '1' : '0') . '|=';
+                $this->bloxconfig['prefilter'] = !empty($this->bloxconfig['prefilter']) ? $filter . '++' . $this->bloxconfig['prefilter'] : $filter;
+            }
+        }
     }
-  
-  }
-
-
-   function checkfilter(){
-		
-		if ($this->bloxconfig['resourceclass']=='modDocument'){
-		if ($this->bloxconfig['showdeleted']=='0' ||$this->bloxconfig['showdeleted']=='0'){
-            $filter = 'deleted|'.$this->bloxconfig['showdeleted'].'|=';				
-			$this->bloxconfig['prefilter'] = ! empty($this->bloxconfig['prefilter'])?$filter.'++'.$this->bloxconfig['prefilter']:$filter;	
-		}
-
-		if ($this->bloxconfig['showunpublished']=='0' ||$this->bloxconfig['showunpublished']=='2'){
-            
-			$filter = 'published|'.(($this->bloxconfig['showunpublished']=='0')?'1':'0').'|=';				
-			$this->bloxconfig['prefilter'] = ! empty($this->bloxconfig['prefilter'])?$filter.'++'.$this->bloxconfig['prefilter']:$filter;	
-		}					
-		}
-   }
 
     function checkparents()
-    
     {
-        
-		global $modx;
-        if (! empty($this->bloxconfig['IDs']) || $this->bloxconfig['resourceclass'] !== 'modDocument')
-        {
+
+        global $modx;
+        if (!empty($this->bloxconfig['IDs']) || $this->bloxconfig['resourceclass'] !== 'modDocument') {
             return;
         }
-		
-        $this->bloxconfig['parents'] = $this->bloxconfig['parents'] !== ''?$this->bloxconfig['parents']:$modx->resource->get('id');
-		
-		$parents = explode(',', $this->bloxconfig['parents']);
-        $depth = $this->bloxconfig['depth'];   
 
-        if ($this->bloxconfig['bloxfolder'] !== ''){
-        	$depth='1';
-			$parents=$this->getBloxfolder($parents);
+        $this->bloxconfig['parents'] = $this->bloxconfig['parents'] !== '' ? $this->bloxconfig['parents'] : $modx->resource->get('id');
+
+        $parents = explode(',', $this->bloxconfig['parents']);
+        $depth = $this->bloxconfig['depth'];
+
+        if ($this->bloxconfig['bloxfolder'] !== '') {
+            $depth = '1';
+            $parents = $this->getBloxfolder($parents);
         }
 
         $parents = $this->getChildParents($parents, $depth);
-		
-		$parents = (count($parents) > 0)?$parents:array('9999999');
-		
 
-            //$filter = 'id|'.implode(',', $ids).'|IN';
-			$filter = 'parent|'.implode(',', $parents).'|IN';
-            $this->bloxconfig['prefilter'] = ! empty($this->bloxconfig['prefilter'])?$filter.'++'.$this->bloxconfig['prefilter']:$filter;
+        $parents = (count($parents) > 0) ? $parents : array('9999999');
+
+
+        //$filter = 'id|'.implode(',', $ids).'|IN';
+        $filter = 'parent|' . implode(',', $parents) . '|IN';
+        $this->bloxconfig['prefilter'] = !empty($this->bloxconfig['prefilter']) ? $filter . '++' . $this->bloxconfig['prefilter'] : $filter;
     }
 
-   function getBloxfolder($parents){
-       global $modx;
-	   $parent = $parents[0];	
-	   $tablename = $modx->getFullTablename(site_content);
-	   $rs = $modx->db->select('id',$tablename,"parent=$parent and pagetitle='".$this->bloxconfig['bloxfolder']."'");
-	   $count = $modx->db->getRecordCount($rs);
-	   $row = $modx->db->getRow($rs);
-	    
-	   return $row = ($count>0)?array($row['id']):array('99999999');
-	   
-   }
-	
-    function checkIDs()
-    
+    function getBloxfolder($parents)
     {
         global $modx;
-        if (! empty($this->bloxconfig['IDs']))
-        {
-        	$ids = $this->bloxconfig['IDs'];
-            $filter = $this->bloxconfig['keyField'].'|'.$ids.'|IN';
-            $this->bloxconfig['prefilter'] = ! empty($this->bloxconfig['prefilter'])?$filter.'++'.$this->bloxconfig['prefilter']:$filter;
+        $parent = $parents[0];
+        $tablename = $modx->getFullTablename(site_content);
+        $rs = $modx->db->select('id', $tablename, "parent=$parent and pagetitle='" . $this->bloxconfig['bloxfolder'] . "'");
+        $count = $modx->db->getRecordCount($rs);
+        $row = $modx->db->getRow($rs);
+
+        return $row = ($count > 0) ? array($row['id']) : array('99999999');
+
+    }
+
+    function checkIDs()
+    {
+        global $modx;
+        if (!empty($this->bloxconfig['IDs'])) {
+            $ids = $this->bloxconfig['IDs'];
+            $filter = $this->bloxconfig['keyField'] . '|' . $ids . '|IN';
+            $this->bloxconfig['prefilter'] = !empty($this->bloxconfig['prefilter']) ? $filter . '++' . $this->bloxconfig['prefilter'] : $filter;
         }
-    
+
     }
 
     function checkRequiredFields()
     {
-        if (count($this->bloxconfig['requiredFields']) > 0)
-        {
-            foreach ($this->bloxconfig['requiredFields'] as $field)
-            {
+        if (count($this->bloxconfig['requiredFields']) > 0) {
+            foreach ($this->bloxconfig['requiredFields'] as $field) {
                 $this->bloxconfig['requiredFields'][$field] = $field;
             }
         }
-		if ($this->bloxconfig['fields'] !== '*'){
-        $fields=explode(',',$this->bloxconfig['fields']);
-		if (count($fields) > 0)
-        {
-            foreach ($fields as $field)
-            {
-                $this->bloxconfig['requiredFields'][$field] = $field;
+        if ($this->bloxconfig['fields'] !== '*') {
+            $fields = explode(',', $this->bloxconfig['fields']);
+            if (count($fields) > 0) {
+                foreach ($fields as $field) {
+                    $this->bloxconfig['requiredFields'][$field] = $field;
+                }
             }
-        }				
-		}
-	
-        $fieldarray = array ('keyField', 'chunknameField', 'captionField','orderByField','filterByField');
-        foreach ($fieldarray as $field)
-        {
-            if ($this->bloxconfig[$field] !== ''){
-            	$this->bloxconfig['requiredFields'][$this->bloxconfig[$field]] = $this->bloxconfig[$field];
-            }
-			
         }
-		if ($this->bloxconfig['resourceclass']=='modDocument'){
-			$this->bloxconfig['requiredFields']['published'] = 'published';
-		}
-    
+
+        $fieldarray = array(
+            'keyField',
+            'chunknameField',
+            'captionField',
+            'orderByField',
+            'filterByField');
+        foreach ($fieldarray as $field) {
+            if ($this->bloxconfig[$field] !== '') {
+                $this->bloxconfig['requiredFields'][$this->bloxconfig[$field]] = $this->bloxconfig[$field];
+            }
+
+        }
+        if ($this->bloxconfig['resourceclass'] == 'modDocument') {
+            $this->bloxconfig['requiredFields']['published'] = 'published';
+        }
+
     }
 
     function checkContainerType()
     {
-    
 
-        if ($this->bloxconfig['c_type'] == 'xcc_container')
-        {
+
+        if ($this->bloxconfig['c_type'] == 'xcc_container') {
             $this->containerclass = 'xcc_bloxcontainer';
             $this->bloxconfig['saveable'] = '0';
             $this->bloxconfig['removeable'] = '0';
             $this->bloxconfig['fillable'] = '0';
-			$this->bloxconfig['removebtn']='1';
-			//Todo: remove this??:
+            $this->bloxconfig['removebtn'] = '1';
+            //Todo: remove this??:
             $this->xcc_button['top'] = '<div class="xcc_button">';
-            $this->xcc_button['caption'] = '[+'.$this->bloxconfig['captionField'].'+]';
+            $this->xcc_button['caption'] = '[+' . $this->bloxconfig['captionField'] . '+]';
             $this->xcc_button['xtools'] = '<div style="opacity: 0; visibility: hidden; width:85px;" class="xtools">
                                                <span class="drag">drag</span>
                                                </div>';
- 		    $this->xcc_button['xtools'] = '';
+            $this->xcc_button['xtools'] = '';
             $this->xcc_button['bottom'] = '</div>';
-			//
+            //
             $this->containerclassnames['containerclass'] = 'xcc_container';
             $this->containerclassnames['rmclass'] = 'unremoveable';
             $this->containerclassnames['fillclass'] = 'fillable_0';
             $this->containerclassnames['saveclass'] = '';
-			$this->bloxconfig['savemode'] = 'copy';
-			
+            $this->bloxconfig['savemode'] = 'copy';
+
             return;
         }
         ;
-    
-    
-    
-    
-        if ($this->bloxconfig['resourceclass'] == 'modDocument')
-        {
+
+
+        if ($this->bloxconfig['resourceclass'] == 'modDocument') {
             $parent = explode(',', $this->bloxconfig['parents']);
-            if (! empty($this->bloxconfig['parents']))
-            {
-    
-                if (count($parent) == 1)
-                {
+            if (!empty($this->bloxconfig['parents'])) {
+
+                if (count($parent) == 1) {
                     $this->bloxconfig['c_parentid'] = $parent[0];
-                    if ($this->bloxconfig['bloxfolder'] == '')
-                    {
+                    if ($this->bloxconfig['bloxfolder'] == '') {
                         $this->bloxconfig['c_type'] = 'parent_container';
                     }
-    
-                }
-                else
-                {
+
+                } else {
                     $this->bloxconfig['c_type'] = 'container';
                     $this->bloxconfig['c_parentid'] = 'unknown';
                 }
             }
-    
-            if (! empty($this->bloxconfig['documents']))
-            {
+
+            if (!empty($this->bloxconfig['documents'])) {
                 $this->bloxconfig['c_type'] = 'container';
                 $this->bloxconfig['c_parentid'] = 'unknown';
             }
         }
     }
 
-    function getTvNames($template = 'all') {
+    function prepareQuery($scriptProperties = array(), &$total = 0, $forcounting = false)
+    {
+        global $modx;
+
+        $limit = $modx->getOption('limit', $scriptProperties, '0');
+        $offset = $modx->getOption('offset', $scriptProperties, 0);
+
+        $selectfields = $modx->getOption('selectfields', $scriptProperties, '');
+        $where = $modx->getOption('where', $scriptProperties, '');
+        $where = !empty($where) ? $modx->fromJSON($where) : array();
+        $queries = $modx->getOption('queries', $scriptProperties, '');
+        $queries = !empty($queries) ? $modx->fromJSON($queries) : array();
+        $sortConfig = $modx->getOption('sortConfig', $scriptProperties, '');
+        $sortConfig = !empty($sortConfig) ? $modx->fromJSON($sortConfig) : array();
+
+        $debug = $modx->getOption('debug', $scriptProperties, false);
+        $joins = $modx->getOption('joins', $scriptProperties, '');
+        $joins = !empty($joins) ? $modx->fromJson($joins) : false;
+        $classname = $scriptProperties['classname'];
+        $c = $modx->newQuery($classname);
+
+        $selectfields = !empty($selectfields) ? explode(',', $selectfields) : null;
+        if ($forcounting) {
+            $c->select('count(1)');
+        } else {
+            $c->select($modx->getSelectColumns($classname, $classname, '', $selectfields));
+        }
+
+
+        if ($joins) {
+            $this->prepareJoins($classname, $joins, $c, $forcounting);
+        }
+
+        if (!empty($where)) {
+            $c->where($where);
+        }
+
+        if (!empty($queries)) {
+            $keys = array('xPDOQuery::SQL_AND' => xPDOQuery::SQL_AND, 'xPDOQuery::SQL_OR' => xPDOQuery::SQL_OR);
+            foreach ($queries as $key => $query) {
+                $c->where($query, $keys[$key]);
+            }
+
+        }
+        if ($forcounting) {
+            if ($debug) {
+                $c->prepare();
+                echo $c->toSql();
+            }
+            if ($c->prepare() && $c->stmt->execute()) {
+                $rows = $c->stmt->fetchAll(PDO::FETCH_COLUMN);
+                $total = (integer)reset($rows);
+
+            }
+            return $c;
+        }
+
+        $total = $modx->getCount($classname, $c);
+
+
+        if (is_array($sortConfig)) {
+            foreach ($sortConfig as $sort) {
+                $sortby = $sort['sortby'];
+                $sortdir = isset($sort['sortdir']) ? $sort['sortdir'] : 'ASC';
+                $c->sortby($sortby, $sortdir);
+            }
+        }
+        if (!empty($limit)) {
+            $c->limit($limit, $offset);
+        }
+
+        if ($debug) {
+            $c->prepare();
+            echo $c->toSql();
+        }
+
+        return $c;
+
+
+    }
+
+    public function prepareJoins($classname, $joins, &$c, $forcounting = false)
+    {
+        global $modx;
+
+        if (is_array($joins)) {
+            foreach ($joins as $join) {
+                $jalias = $modx->getOption('alias', $join, '');
+                $joinclass = $modx->getOption('classname', $join, '');
+                $on = $modx->getOption('on', $join, null);
+                if (!empty($jalias)) {
+                    if (empty($joinclass) && $fkMeta = $modx->getFKDefinition($classname, $jalias)) {
+                        $joinclass = $fkMeta['class'];
+                    }
+                    if (!empty($joinclass)) {
+                        $selectfields = $modx->getOption('selectfields', $join, '');
+
+                        /*
+                        if ($joinFkMeta = $modx->getFKDefinition($joinclass, 'Resource')){
+                        $localkey = $joinFkMeta['local'];
+                        }    
+                        */
+                        $c->leftjoin($joinclass, $jalias, $on);
+                        $selectfields = !empty($selectfields) ? explode(',', $selectfields) : null;
+                        if ($forcounting) {
+
+                        } else {
+                            $c->select($modx->getSelectColumns($joinclass, $jalias, $jalias . '_', $selectfields));
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+
+    function getTvNames($template = 'all')
+    {
         global $modx;
         $t_tv = $modx->getFullTableName('site_tmplvars');
         if ($template !== 'all') {
-            $table2 = $modx->getFullTableName('site_tmplvar_templates').' stt ';
-            $tablenames = $t_tv.','.$table2;
-            $query = 'SELECT id,name FROM '.$tablenames.'WHERE templateid='.$template.' and stt.tmplvarid=st.id';
+            $table2 = $modx->getFullTableName('site_tmplvar_templates') . ' stt ';
+            $tablenames = $t_tv . ',' . $table2;
+            $query = 'SELECT id,name FROM ' . $tablenames . 'WHERE templateid=' . $template . ' and stt.tmplvarid=st.id';
             $result = $modx->db->query($query);
-        }
-        else {
+        } else {
             $result = $modx->db->select('*', $t_tv, '');
         }
         $tv_arrays = $modx->db->makeArray($result);
-        $tvnames = array ();
-        $tvids = array ();
+        $tvnames = array();
+        $tvids = array();
         foreach ($tv_arrays as $tv_array) {
             $tvid = $tv_array['id'];
             $tvnames[$tvid] = $tv_array['name'];
@@ -283,29 +379,32 @@ class blox {
         return;
     }
 
-    function getDocColumnNames() {
+    function getDocColumnNames()
+    {
         global $modx;
         $fields = $modx->getFields('modResource');
-        $this->docColumnNames=array();
-        foreach ($fields as $key=>$field) {
+        $this->docColumnNames = array();
+        foreach ($fields as $key => $field) {
             $this->docColumnNames[] = $key;
         }
         return;
     }
 
-    function addAttribute($key,$value,$attributes=array()) {
+    function addAttribute($key, $value, $attributes = array())
+    {
 
-        $attributes[$key]=$key.'="'.$value.'"';
+        $attributes[$key] = $key . '="' . $value . '"';
         return $attributes;
 
     }
 
-    function addBloxAttributes($keys,$attributes=array()) {
+    function addBloxAttributes($keys, $attributes = array())
+    {
         $keys = explode(',', $keys);
         if (count($keys) > 0) {
             foreach ($keys as $key) {
                 if (isset($this->bloxconfig[$key]) && $this->bloxconfig[$key] !== '') {
-                    $attributes = $this->addAttribute($key,$this->bloxconfig[$key],$attributes);
+                    $attributes = $this->addAttribute($key, $this->bloxconfig[$key], $attributes);
                 }
 
             }
@@ -316,9 +415,10 @@ class blox {
     //Display bloX
     /////////////////////////////////////////////////
 
-    function displayblox() {
+    function displayblox()
+    {
 
-        $datas = $this->getdatas($this->date,$this->bloxconfig['includesfile']);
+        $datas = $this->getdatas($this->date, $this->bloxconfig['includesfile']);
         return $this->displaydatas($datas);
 
     }
@@ -327,94 +427,95 @@ class blox {
     //displaydatas (bloxouterTpl)
     /////////////////////////////////////////////////
 
-    function displaydatas($outerdata = array ()) {
+    function displaydatas($outerdata = array())
+    {
         global $modx;
 
-//$outerdata['innerrows']['row']='innerrows.row';
-        $start=time();
+        //$outerdata['innerrows']['row']='innerrows.row';
+        $start = time();
         $this->regSnippetScriptsAndCSS();
-        $cache = $modx->getOption('cacheaction',$outerdata,'');
-        $cachename = $modx->getOption('cachename',$outerdata,'');
+        $cache = $modx->getOption('cacheaction', $outerdata, '');
+        $cachename = $modx->getOption('cachename', $outerdata, '');
         if ($cache == '2') {
             return $outerdata['cacheoutput'];
         }
 
-        
-        $bloxouterTplData = array ();
-        $bloxinnerrows = array ();
-		$bloxinnercounts = array ();
 
-        $xeditruns = $modx->getOption('xedit_runs',$GLOBALS,'0'); 
-        if ($xeditruns == '1'){
-        	$outerdata['innerrows']['bloxdummy'][]=array('caption'=>'Dummy');	
+        $bloxouterTplData = array();
+        $bloxinnerrows = array();
+        $bloxinnercounts = array();
+
+        $xeditruns = $modx->getOption('xedit_runs', $GLOBALS, '0');
+        if ($xeditruns == '1') {
+            $outerdata['innerrows']['bloxdummy'][] = array('caption' => 'Dummy');
         }
 
-        $innerrows = $modx->getOption('innerrows',$outerdata,array());
-		unset($outerdata['innerrows']);
+        $innerrows = $modx->getOption('innerrows', $outerdata, array());
+        unset($outerdata['innerrows']);
 
         if (count($innerrows) > 0) {
-            foreach ($innerrows as $key=>$row) {
- 				$daten = '';
-				$innertpl='';
-				if (isset($this->tpls[$key])){
-					$innertpl=$this->tpls[$key];
-				}
-				else{
-                $tplfile = $this->bloxconfig['tplpath'] . "/" . $key . "Tpl.html";
-                if (file_exists($modx->config['base_path'].$tplfile)) {
-                    $innertpl = "@FILE:" . $tplfile;
-                }					
-				}
-				
-				if ($innertpl !== ''){
-                    $data=$this->renderdatarows($row,$innertpl,$key,$outerdata);
-					$bloxinnerrows[$key] = $data;
-					$bloxinnercounts[$key] = count($row);
-				}
+            foreach ($innerrows as $key => $row) {
+                $daten = '';
+                $innertpl = '';
+                if (isset($this->tpls[$key])) {
+                    $innertpl = $this->tpls[$key];
+                } else {
+                    $tplfile = $this->bloxconfig['tplpath'] . "/" . $key . "Tpl.html";
+                    if (file_exists($modx->config['base_path'] . $tplfile)) {
+                        $innertpl = "@FILE:" . $tplfile;
+                    }
+                }
+
+                if ($innertpl !== '') {
+                    $data = $this->renderdatarows($row, $innertpl, $key, $outerdata);
+                    $bloxinnerrows[$key] = $data;
+                    $bloxinnercounts[$key] = count($row);
+                }
 
             }
         }
-        $outerdata['innerrows']=$bloxinnerrows;
-		$outerdata['innercounts']=$bloxinnercounts;
-        $bloxouterTplData['containerattributes'] = implode(' ',$this->containerattributes);
+        $outerdata['innerrows'] = $bloxinnerrows;
+        $outerdata['innercounts'] = $bloxinnercounts;
+        $bloxouterTplData['containerattributes'] = implode(' ', $this->containerattributes);
 
-/*
+        /*
         $key='message';
         $tplfile = $this->bloxconfig['tplpath'] . "/" . $key . "Tpl.html";
         $innertpl=(file_exists($tplfile))?$innertpl="@FILE:".$tplfile:'';
         $row=$this->messages;
         $massagedata=$this->renderdatarows($row,$innertpl,$key);
         $bloxouterTplData['messages'] = $massagedata;
-*/
+        */
         $bloxouterTplData['row'] = $outerdata;
-        $bloxouterTplData['config'] = $this->bloxconfig;		
-		$bloxouterTplData['containerclassnames'] = implode (' ',$this->containerclassnames);
-        $outerdata['blox']=$bloxouterTplData;
+        $bloxouterTplData['config'] = $this->bloxconfig;
+        $bloxouterTplData['containerclassnames'] = implode(' ', $this->containerclassnames);
+        $outerdata['blox'] = $bloxouterTplData;
 
         $tpl = new xettChunkie($this->tpls['bloxouter']);
-		$tpl->placeholders=$outerdata;
+        $tpl->placeholders = $outerdata;
         $daten = $tpl->Render();
-		unset ($tpl);
+        unset($tpl);
         if ($cache == '1') {
             $this->cache->writeCache($cachename, $daten);
         }
-        $end=time();
-		//echo ($end-$start);       
+        $end = time();
+        //echo ($end-$start);
         return $daten;
     }
     //////////////////////////////////////////////////
     //renderdatarows
     /////////////////////////////////////////////////
-    function renderdatarows($rows, $tpl, $rowkey='',$outerdata=array()) {
+    function renderdatarows($rows, $tpl, $rowkey = '', $outerdata = array())
+    {
         //$this->renderdepth++;//Todo
         $output = '';
         if (is_array($rows)) {
-		$iteration = 0;
-		$rowscount = count($rows);
+            $iteration = 0;
+            $rowscount = count($rows);
             foreach ($rows as $row) {
-            	$iteration++;
-                $out=$this->renderdatarow($row, $tpl,$rowkey,$outerdata,$rowscount,$iteration);
-				$output .=$out; 
+                $iteration++;
+                $out = $this->renderdatarow($row, $tpl, $rowkey, $outerdata, $rowscount, $iteration);
+                $output .= $out;
 
             }
         }
@@ -424,137 +525,97 @@ class blox {
     //////////////////////////////////////////////////
     //renderdatarow and custom-innerrows (bloxouterTpl)
     /////////////////////////////////////////////////
-    function renderdatarow($row, $rowTpl = 'default',$rowkey='',$outerdata=array(),$rowscount,$iteration) {
+    function renderdatarow($row, $rowTpl = 'default', $rowkey = '', $outerdata = array(), $rowscount, $iteration)
+    {
         global $modx;
 
         $date = $this->date;
 
-        if ( isset ($row['tpl'])) {
-            $tplfilename = $this->bloxconfig['tplpath']."/".$row['tpl'];
+        if (isset($row['tpl'])) {
+            $tplfilename = $this->bloxconfig['tplpath'] . "/" . $row['tpl'];
             if (($row['tpl'] !== '') && (file_exists($tplfilename))) {
-                $rowTpl = "@FILE:".$tplfilename;
+                $rowTpl = "@FILE:" . $tplfilename;
             }
         }
 
-		if (substr($rowTpl,0,7) == '@FIELD:'){
-            $rowTpl=($row[substr($rowTpl,7)]);
-		}						
+        if (substr($rowTpl, 0, 7) == '@FIELD:') {
+            $rowTpl = ($row[substr($rowTpl, 7)]);
+        }
 
-        $datarowTplData = array ();
-        $bloxinnerrows = array ();
-		$bloxinnercounts = array ();
-        $innerrows = $modx->getOption('innerrows',$row,'');
-		unset($row['innerrows']);
+        $datarowTplData = array();
+        $bloxinnerrows = array();
+        $bloxinnercounts = array();
+        $innerrows = $modx->getOption('innerrows', $row, '');
+        unset($row['innerrows']);
 
-        
+
         if ((is_array($innerrows)) && (count($innerrows) > 0)) {
-            foreach ($innerrows as $key=>$innerrow) {
- 				$daten = '';
-				$innertpl='';
-				if (isset($this->tpls[$key])){
-					$innertpl=$this->tpls[$key];
-				}
-				else{
-                $tplfile = $this->bloxconfig['tplpath'] . "/" . $key . "Tpl.html";
-                if (file_exists($modx->config['base_path'].$tplfile)) {
-                    $innertpl = "@FILE:" . $tplfile;
-                }					
-				}
-				if (isset($this->templates[$innertpl])||$innertpl !== ''){
+            foreach ($innerrows as $key => $innerrow) {
+                $daten = '';
+                $innertpl = '';
+                if (isset($this->tpls[$key])) {
+                    $innertpl = $this->tpls[$key];
+                } else {
+                    $tplfile = $this->bloxconfig['tplpath'] . "/" . $key . "Tpl.html";
+                    if (file_exists($modx->config['base_path'] . $tplfile)) {
+                        $innertpl = "@FILE:" . $tplfile;
+                    }
+                }
+                if (isset($this->templates[$innertpl]) || $innertpl !== '') {
                     $data = $this->renderdatarows($innerrow, $innertpl, $key, $row);
                     $datarowTplData['innerrows'][$key] = $data;
                     $bloxinnerrows[$key] = $data;
-					$bloxinnercounts[$key] = count($innerrow);
-				}
+                    $bloxinnercounts[$key] = count($innerrow);
+                }
 
             }
         }
- 
-		if(count($bloxinnerrows)>0){
-		$row['innerrows']=$bloxinnerrows;
-		$row['innercounts']=$bloxinnercounts;			
-		}
 
-        if (count($row)>0) {
-            foreach($row as $field=>$value) {
-                if (!is_array($value)) {
-				
-					$outputvalue=$value;
-
-                    if ($this->bloxconfig['processTVs'] == '1' && $this->bloxconfig['resourceclass'] == 'modDocument' && in_array($field, $this->tvnames))
-                    
-                    {
-                        //$outputvalue = $modx->getTemplateVarOutput($field, $row['id']);
-                        //$outputvalue = $outputvalue[$field];
-                        //$resource = $modx->getObject('modResource', $row['id']);
-                        //$outputvalue = $resource->getTVValue($field);
-
-                        $tv = $modx->getObject('modTemplateVar', array ('name'=>$field));
-                        $outputvalue = $tv->renderOutput($row['id']);
-                    
-                    }
-					
-					//$outputvalue=$value;
-					
-                    //$tpl->addVar($field,$outputvalue);
-					$row[$field]=$outputvalue;
-                    $fieldname=$field;
-                    if ($rowkey=='rowvalue') {
-                        $fieldname=$row['fieldname'];
-                    //$value=$row['value'];
-                    }
-                    $tag='##';
-                    //$tpl->addVar($tag.$field,$this->generateDivForXedit($row,$fieldname,$value,$tag,$bloxattributes));
-                    $row[$tag.$field]=$this->generateDivForXedit($row,$fieldname,$value,$tag);
-					$tag='#';
-                    //$tpl->addVar($tag.$field,$this->generateDivForXedit($row,$fieldname,$outputvalue,$tag,$bloxattributes));
-                    $row[$tag.$field]=$this->generateDivForXedit($row,$fieldname,$value,$tag);
-				}
-				else {
-					$row[$field]=$value;
-				}
-            }
+        if (count($bloxinnerrows) > 0) {
+            $row['innerrows'] = $bloxinnerrows;
+            $row['innercounts'] = $bloxinnercounts;
         }
 
         $datarowTplData['parent'] = $outerdata;
         $datarowTplData['event'] = $row;
         $datarowTplData['date'] = $date;
         $datarowTplData['row'] = $row;
-		$datarowTplData['rowscount'] = $rowscount;
-		$datarowTplData['iteration'] = $iteration;		
-		$datarowTplData['xcc_button'] = $this->xcc_button;
+        $datarowTplData['rowscount'] = $rowscount;
+        $datarowTplData['iteration'] = $iteration;
+        $datarowTplData['xcc_button'] = $this->xcc_button;
         $datarowTplData['config'] = $this->bloxconfig;
         $datarowTplData['userID'] = $this->bloxconfig['userID'];
         //$tpl->addVar('blox', $datarowTplData);
-		$row['blox']=$datarowTplData;
-		//echo '<br/>'.$rowkey.':'.$row['rowvalue'].'---------------<br/>';
-		//print_r($row);		
+        $row['blox'] = $datarowTplData;
+        //echo '<br/>'.$rowkey.':'.$row['rowvalue'].'---------------<br/>';
+        //print_r($row);
         //$tpl = new xettChunkie($rowTpl,& $this->templates);
-		$tpl = new xettChunkie($rowTpl);		
-        $tpl->placeholders=$row;
-		$output = $tpl->Render();
-		
-		if ($rowkey=='row'||$rowkey=='fieldnames'||($rowkey=='rowvalue'&&$row['value']=='test')){
+        $tpl = new xettChunkie($rowTpl);
+        $tpl->placeholders = $row;
+        $output = $tpl->Render();
 
-            //echo '<br/>'.$rowkey.':'.$row['rowvalue'].'---------------<br/>';
-			//echo $output = $tpl->Render();
-			
-		}
-		unset($tpl,$row);
-		
-		return $output;
+        /*
+        if ($rowkey == 'row' || $rowkey == 'fieldnames' || ($rowkey == 'rowvalue' && $row['value'] == 'test')) {
+
+        echo '<br/>'.$rowkey.':'.$row['rowvalue'].'---------------<br/>';
+        echo $output = $tpl->Render();
+
+        }
+        */
+        unset($tpl, $row);
+
+        return $output;
     }
-
-
 
 
     //////////////////////////////////////////////////
     //renderdatarow and custom-innerrows (bloxouterTpl)
     /////////////////////////////////////////////////
-    function renderdatarow2($row, $rowTpl = 'default',$rowkey='',$outerdata=array(),$rowscount,$iteration) {
+    function renderdatarow2($row, $rowTpl = 'default', $rowkey = '', $outerdata = array(), $rowscount, $iteration)
+    {
         global $modx;
-		
-		$cache = $row['cacheaction'];
+
+        $cache = $row['cacheaction'];
         $cachename = $row['cachename'];
         if ($cache == '2') {
             return $row['cacheoutput'];
@@ -563,126 +624,124 @@ class blox {
         //echo $rowkey;
         //$innerdatas = $this->innerdatas;
         //$rowTpl = ($rowTpl == 'default')?$this->bloxtpl['datarowTpl']:$rowTpl;
-		//Todo: add functionality for chunk,file,code
-        if ( isset ($row['tpl'])) {
-            $tplfilename = $this->bloxconfig['tplpath']."/".$row['tpl'];
+        //Todo: add functionality for chunk,file,code
+        if (isset($row['tpl'])) {
+            $tplfilename = $this->bloxconfig['tplpath'] . "/" . $row['tpl'];
             if (($row['tpl'] !== '') && (file_exists($tplfilename))) {
-                $rowTpl = "@FILE:".$tplfilename;
+                $rowTpl = "@FILE:" . $tplfilename;
             }
         }
 
         //print_r($row);
         //echo $this->bloxconfig['includespath'] . "/" . $rowkey . "Getdatas.php <br/>";
-        if ($row['getDatasOnRender']=='1') {
-        $this->bloxconfig['includespath'] . "/" . $rowkey . "Getdatas.php";
-            $getdatas = $this->getdatas($date,$this->bloxconfig['includespath'] . "/" . $rowkey . "Getdatas.php",$row);
-            $row=array_merge($row,$getdatas);
+        if ($row['getDatasOnRender'] == '1') {
+            $this->bloxconfig['includespath'] . "/" . $rowkey . "Getdatas.php";
+            $getdatas = $this->getdatas($date, $this->bloxconfig['includespath'] . "/" . $rowkey . "Getdatas.php", $row);
+            $row = array_merge($row, $getdatas);
         }
 
-		if (substr($rowTpl,0,7) == '@FIELD:'){
-            $rowTpl=($row[substr($rowTpl,7)]);
-		}						
-		
+        if (substr($rowTpl, 0, 7) == '@FIELD:') {
+            $rowTpl = ($row[substr($rowTpl, 7)]);
+        }
+
         //$tpl = new xettChunkie($rowTpl,& $this->templates);
-		//$tpl = new xettChunkie($rowTpl);
-        $datarowTplData = array ();
-        $bloxinnerrows = array ();
-		$bloxinnercounts = array ();
+        //$tpl = new xettChunkie($rowTpl);
+        $datarowTplData = array();
+        $bloxinnerrows = array();
+        $bloxinnercounts = array();
         $innerrows = $row['innerrows'];
-		unset($row['innerrows']);
-/*
+        unset($row['innerrows']);
+        /*
         if ((is_array($innerrows)) && (count($innerrows) > 0)) {
-            foreach ($innerrows as $key=>$innerrow) {
-                $tplfile = $this->bloxconfig['tplpath']."/".$key."Tpl.html";
-                $innertpl = "@FILE:".$tplfile;
-                
-                if (isset ($this->templates[$innertpl])||file_exists($modx->config['base_path'].$tplfile)) {
-                    $data = $this->renderdatarows($innerrow, $innertpl, $key, $row);
-                    $datarowTplData['innerrows'][$key] = $data;
-                    $bloxinnerrows[$key] = $data;
-                }
-            }
-        }
-*/
+        foreach ($innerrows as $key=>$innerrow) {
+        $tplfile = $this->bloxconfig['tplpath']."/".$key."Tpl.html";
+        $innertpl = "@FILE:".$tplfile;
         
+        if (isset ($this->templates[$innertpl])||file_exists($modx->config['base_path'].$tplfile)) {
+        $data = $this->renderdatarows($innerrow, $innertpl, $key, $row);
+        $datarowTplData['innerrows'][$key] = $data;
+        $bloxinnerrows[$key] = $data;
+        }
+        }
+        }
+        */
+
         if ((is_array($innerrows)) && (count($innerrows) > 0)) {
-            foreach ($innerrows as $key=>$innerrow) {
- 				$daten = '';
-				$innertpl='';
-				if (isset($this->tpls[$key])){
-					$innertpl=$this->tpls[$key];
-				}
-				else{
-                $tplfile = $this->bloxconfig['tplpath'] . "/" . $key . "Tpl.html";
-                if (file_exists($modx->config['base_path'].$tplfile)) {
-                    $innertpl = "@FILE:" . $tplfile;
-                }					
-				}
-				if (isset($this->templates[$innertpl])||$innertpl !== ''){
+            foreach ($innerrows as $key => $innerrow) {
+                $daten = '';
+                $innertpl = '';
+                if (isset($this->tpls[$key])) {
+                    $innertpl = $this->tpls[$key];
+                } else {
+                    $tplfile = $this->bloxconfig['tplpath'] . "/" . $key . "Tpl.html";
+                    if (file_exists($modx->config['base_path'] . $tplfile)) {
+                        $innertpl = "@FILE:" . $tplfile;
+                    }
+                }
+                if (isset($this->templates[$innertpl]) || $innertpl !== '') {
                     $data = $this->renderdatarows($innerrow, $innertpl, $key, $row);
                     $datarowTplData['innerrows'][$key] = $data;
                     $bloxinnerrows[$key] = $data;
-					$bloxinnercounts[$key] = count($innerrow);
-				}
+                    $bloxinnercounts[$key] = count($innerrow);
+                }
 
             }
         }
-        
-		
-		$row['innerrows']=$bloxinnerrows;
-		$row['innercounts']=$bloxinnercounts;
+
+
+        $row['innerrows'] = $bloxinnerrows;
+        $row['innercounts'] = $bloxinnercounts;
 
         if ($GLOBALS['xedit_runs'] == '1') {
             $bloxattributes = $this->addBloxAttributes('xedit_tabs,tablename,resourceclass,savemode');
             //$bloxattributes = $this->addAttribute('chunkname',$row[$this->bloxconfig['chunknameField']],$bloxattributes);
-			$bloxattributes = $this->addAttribute('chunkname',$rowTpl,$bloxattributes);
-            $bloxattributes = $this->addAttribute('rowid',$row[$this->bloxconfig['keyField']],$bloxattributes);
-			$bloxattributes = $this->addAttribute('published',$row['published'],$bloxattributes);
-            $dragbtn = $this->bloxconfig['dragbtn']!=='0'?'<span class="drag">drag</span>':'';
-			$trashbtn = $this->bloxconfig['trashbtn']!=='0'?'<span class="xtrash">trash</span>':'';
-			$savebtn = $this->bloxconfig['savebtn']!=='0'?'<span class="save">save</span>':'';
-			$removebtn = $this->bloxconfig['removebtn']!=='0'?'<span class="remove">remove</span>	':'';
-			
-			
-			$xtools='
+            $bloxattributes = $this->addAttribute('chunkname', $rowTpl, $bloxattributes);
+            $bloxattributes = $this->addAttribute('rowid', $row[$this->bloxconfig['keyField']], $bloxattributes);
+            $bloxattributes = $this->addAttribute('published', $row['published'], $bloxattributes);
+            $dragbtn = $this->bloxconfig['dragbtn'] !== '0' ? '<span class="drag">drag</span>' : '';
+            $trashbtn = $this->bloxconfig['trashbtn'] !== '0' ? '<span class="xtrash">trash</span>' : '';
+            $savebtn = $this->bloxconfig['savebtn'] !== '0' ? '<span class="save">save</span>' : '';
+            $removebtn = $this->bloxconfig['removebtn'] !== '0' ? '<span class="remove">remove</span>	' : '';
+
+
+            $xtools = '
         <div class="xtools" style="opacity: 0; visibility: hidden;width:85px;">
-        '.$dragbtn.$trashbtn.$savebtn.$removebtn.'
+        ' . $dragbtn . $trashbtn . $savebtn . $removebtn . '
         </div>		
     	';
 
-            $datarowTplData['bloxattributes'] = implode(' ',$bloxattributes);
+            $datarowTplData['bloxattributes'] = implode(' ', $bloxattributes);
             $datarowTplData['xtools'] = $xtools;
         }
-		
-        if (count($row)>0) {
-            foreach($row as $field=>$value) {
+
+        if (count($row) > 0) {
+            foreach ($row as $field => $value) {
                 if (!is_array($value)) {
-                	
-					$outputvalue=$value;
-					
-					if ($this->bloxconfig['resourceclass']=='modDocument' && in_array($field,$this->tvnames)){
-						
-						$outputvalue=$modx->getTemplateVarOutput($field,$row['id']);
-						$outputvalue=$outputvalue[$field];
-					}
-					
-                    //$tpl->addVar($field,$outputvalue);
-					$row[$field]=$outputvalue;
-                    $fieldname=$field;
-                    if ($rowkey=='rowvalue') {
-                        $fieldname=$row['fieldname'];
-                    //$value=$row['value'];
+
+                    $outputvalue = $value;
+
+                    if ($this->bloxconfig['resourceclass'] == 'modDocument' && in_array($field, $this->tvnames)) {
+
+                        $outputvalue = $modx->getTemplateVarOutput($field, $row['id']);
+                        $outputvalue = $outputvalue[$field];
                     }
-                    $tag='##';
+
+                    //$tpl->addVar($field,$outputvalue);
+                    $row[$field] = $outputvalue;
+                    $fieldname = $field;
+                    if ($rowkey == 'rowvalue') {
+                        $fieldname = $row['fieldname'];
+                        //$value=$row['value'];
+                    }
+                    $tag = '##';
                     //$tpl->addVar($tag.$field,$this->generateDivForXedit($row,$fieldname,$value,$tag,$bloxattributes));
-                    $row[$tag.$field]=$this->generateDivForXedit($row,$fieldname,$value,$tag,$bloxattributes);
-					$tag='#';
+                    $row[$tag . $field] = $this->generateDivForXedit($row, $fieldname, $value, $tag, $bloxattributes);
+                    $tag = '#';
                     //$tpl->addVar($tag.$field,$this->generateDivForXedit($row,$fieldname,$outputvalue,$tag,$bloxattributes));
-                    $row[$tag.$field]=$this->generateDivForXedit($row,$fieldname,$value,$tag,$bloxattributes);
-				}
-				else {
-					$row[$field]=$value;
-				}
+                    $row[$tag . $field] = $this->generateDivForXedit($row, $fieldname, $value, $tag, $bloxattributes);
+                } else {
+                    $row[$field] = $value;
+                }
             }
         }
 
@@ -690,81 +749,81 @@ class blox {
         $datarowTplData['event'] = $row;
         $datarowTplData['date'] = $date;
         $datarowTplData['row'] = $row;
-		$datarowTplData['rowscount'] = $rowscount;
-		$datarowTplData['iteration'] = $iteration;		
-		$datarowTplData['xcc_button'] = $this->xcc_button;
+        $datarowTplData['rowscount'] = $rowscount;
+        $datarowTplData['iteration'] = $iteration;
+        $datarowTplData['xcc_button'] = $this->xcc_button;
         $datarowTplData['config'] = $this->bloxconfig;
         $datarowTplData['userID'] = $this->bloxconfig['userID'];
         //$tpl->addVar('blox', $datarowTplData);
-		$row['blox']=$datarowTplData;
-		//print_r($tpl);
+        $row['blox'] = $datarowTplData;
+        //print_r($tpl);
         //$tpl = new xettChunkie($rowTpl,& $this->templates);
-		$tpl = new xettChunkie($rowTpl);		
-        $tpl->placeholders=$row;
-		$output = $tpl->Render();
-		unset($tpl);
+        $tpl = new xettChunkie($rowTpl);
+        $tpl->placeholders = $row;
+        $output = $tpl->Render();
+        unset($tpl);
         if ($cache == '1') {
             $this->cache->writeCache($cachename, $output);
         }
-        if ($row['makexccbutton'] == '1')
-        {
+        if ($row['makexccbutton'] == '1') {
             /*
-			$dragtools='
-                    <div style="opacity: 0; visibility: hidden; width:85px;" class="xtools">
-                        <span class="drag">drag</span>
-                    </div>
-                	';
-            */    	
+            $dragtools='
+            <div style="opacity: 0; visibility: hidden; width:85px;" class="xtools">
+            <span class="drag">drag</span>
+            </div>
+            ';
+            */
             $output = '
                 	<div class="xcc_button">
-                	'.$row[$this->bloxconfig['captionField']].$dragtools.$output.'
+                	' . $row[$this->bloxconfig['captionField']] . $dragtools . $output . '
                 	</div>
                 	';
             //$this->xcc_button['caption'] = '[+'.$this->bloxconfig['captionField'].'+]';
             //echo $row[$this->bloxconfig['captionField']] ;
             //echo 'haaaaaaaaaaaaaallo';
             /*
-             $key='bloxXCCbutton';
-             $buttonrow['caption']=$row[$this->bloxconfig['captionField']];
-             $buttonrow['bloxrow']=$output;
-             $output = $this->renderdatarow($buttonrow, $innertpl, $key, $row);
-             */
+            $key='bloxXCCbutton';
+            $buttonrow['caption']=$row[$this->bloxconfig['captionField']];
+            $buttonrow['bloxrow']=$output;
+            $output = $this->renderdatarow($buttonrow, $innertpl, $key, $row);
+            */
             /*
-             $tpl = new xettChunkie($rowTpl,& $this->templates);
-             $tpl->addVar('bloxrow',$output);
-             $tpl->addVar('caption',$row[$this->bloxconfig['captionField']]);
-             //$this->xcc_button['caption'] = '[+'.$this->bloxconfig['captionField'].'+]';
-             echo $row[$this->bloxconfig['captionField']] ;
-             //echo 'haaaaaaaaaaaaaallo';
-             $output = $tpl->Render();
-             */
-        
+            $tpl = new xettChunkie($rowTpl,& $this->templates);
+            $tpl->addVar('bloxrow',$output);
+            $tpl->addVar('caption',$row[$this->bloxconfig['captionField']]);
+            //$this->xcc_button['caption'] = '[+'.$this->bloxconfig['captionField'].'+]';
+            echo $row[$this->bloxconfig['captionField']] ;
+            //echo 'haaaaaaaaaaaaaallo';
+            $output = $tpl->Render();
+            */
+
         }
-		
-		return $output;
+
+        return $output;
     }
 
-    function generateDivForXedit($row, $fieldname, $value, $tag, $bloxattributes=array()) {
+    function generateDivForXedit($row, $fieldname, $value, $tag, $bloxattributes = array())
+    {
         $div_content = $value;
         global $modx;
-        $xeditruns = $modx->getOption('xedit_runs',$GLOBALS,'0');
-        if ($xeditruns == '1' && $fieldname!==$this->bloxconfig['keyField']) {
+        $xeditruns = $modx->getOption('xedit_runs', $GLOBALS, '0');
+        if ($xeditruns == '1' && $fieldname !== $this->bloxconfig['keyField']) {
 
-        //TODO:  Feldattribute (tablename,resourceclass,rowid) individuell pro Feld überschreiben
-        //$bloxattributes = $this->addAttribute('rowid',$row[$this->bloxconfig['keyField']],$bloxattributes);
-            switch($tag) {
+            //TODO:  Feldattribute (tablename,resourceclass,rowid) individuell pro Feld überschreiben
+            //$bloxattributes = $this->addAttribute('rowid',$row[$this->bloxconfig['keyField']],$bloxattributes);
+            switch ($tag) {
                 case '#':
-                    $div_content = '<div '.implode(' ', $bloxattributes).' fieldname="'.$fieldname.'" class="xedit">'.$value.'</div>';
+                    $div_content = '<div ' . implode(' ', $bloxattributes) . ' fieldname="' . $fieldname . '" class="xedit">' . $value . '</div>';
                     break;
                 case '##':
-                    $tv = array ();
-                    switch($this->bloxconfig['resourceclass']) {
+                    $tv = array();
+                    switch ($this->bloxconfig['resourceclass']) {
                         case 'modDocument':
                             /*
-                             $tv = $xedit->getNewMultiTvs( array ($formElementTv));
-                             $tv = $tv[$formElementTv];
-                             $tv['content'] = $formElementValue;
-                             */
+                            $tv = $xedit->getNewMultiTvs( array ($formElementTv));
+                            $tv = $tv[$formElementTv];
+                            $tv['content'] = $formElementValue;
+                            */
                             $tv['content'] = $value;
                             $tv['type'] = 'text';
                             $tv['formname'] = $fieldname;
@@ -780,7 +839,7 @@ class blox {
                     }
                     $prefix = 'tv';
                     $formelement = $this->fe->makeFormelement($tv, $prefix);
-                    $div_content = '<div '.implode(' ', $bloxattributes).' fieldname="'.$fieldname.'" class="xedit_input">'.$formelement.'</div>';
+                    $div_content = '<div ' . implode(' ', $bloxattributes) . ' fieldname="' . $fieldname . '" class="xedit_input">' . $formelement . '</div>';
                     break;
                 default:
 
@@ -794,7 +853,8 @@ class blox {
     //////////////////////////////////////////////////
     //neue Daten in Tabelle speichern
     /////////////////////////////////////////////////
-    function dbinsert($row, $table = 'default') {
+    function dbinsert($row, $table = 'default')
+    {
         global $modx;
         if ($table == 'default') {
             $table = $modx->getFullTableName($this->bloxconfig['xet_tablename']);
@@ -815,7 +875,8 @@ class blox {
     //////////////////////////////////////////////////
     //Zeiten aus Tabelle holen
     /////////////////////////////////////////////////
-    function getevents($query) {
+    function getevents($query)
+    {
         global $modx;
         $rs = $modx->db->query($query);
         $allrows = $modx->db->makeArray($rs);
@@ -830,19 +891,20 @@ class blox {
     //////////////////////////////////////////////////////
     //Daten-array holen
     //////////////////////////////////////////////////////
-    function getdatas($date,$file,$row=array()) {
+    function getdatas($date, $file, $row = array())
+    {
         global $modx;
         $scriptProperties = $this->bloxconfig['scriptProperties'];
-        $file=$modx->config['base_path'].$file;
+        $file = $modx->config['base_path'] . $file;
         if ($date == 'dayisempty') {
-            $bloxdatas = array ();
+            $bloxdatas = array();
         } else {
             $userID = $this->bloxconfig['userID'];
 
             if (file_exists($file)) {
-            //$innerdatas = array ();
+                //$innerdatas = array ();
                 include ($file);
-            //$this->innerdatas=$innerdatas;
+                //$this->innerdatas=$innerdatas;
             } else {
                 $daten = "includes-File " . $file . " nicht gefunden3";
             }
@@ -857,18 +919,19 @@ class blox {
     //spezial processing with date and time formfields
     //handles array and non-array input-fields
     ///////////////////////////////////////////////////
-    function getformfields($addbacktic='1') {
+    function getformfields($addbacktic = '1')
+    {
         $setfields = explode(',', $this->bloxconfig['setfields']);
-        $id=(isset($_POST['eventID']))?$_POST['eventID']:0;
-        $rows=array();
-        $backtic=($addbacktic=='1')?'`':'';
+        $id = (isset($_POST['eventID'])) ? $_POST['eventID'] : 0;
+        $rows = array();
+        $backtic = ($addbacktic == '1') ? '`' : '';
         foreach ($setfields as $setfieldfull) {
-        //setfields for date
-        //Format A Feldname:inputfield-date||inputfield-time
-        //Format B Feldname:inputfield-day||inputfield-month||inputfield-year||inputfield-hour||inputfield-minute
-            $setfieldarr=explode(':',$setfieldfull);
-            $setfield=$setfieldarr[0];
-            $datefieldsplits=array();
+            //setfields for date
+            //Format A Feldname:inputfield-date||inputfield-time
+            //Format B Feldname:inputfield-day||inputfield-month||inputfield-year||inputfield-hour||inputfield-minute
+            $setfieldarr = explode(':', $setfieldfull);
+            $setfield = $setfieldarr[0];
+            $datefieldsplits = array();
             if (count($setfieldarr) > 1) {
                 $datefieldsplits = explode('||', $setfieldarr[1]);
                 if ((count($datefieldsplits) == 2) || (count($datefieldsplits) == 5)) {
@@ -927,8 +990,9 @@ class blox {
     //////////////////////////////////////////////////
     //Get Timevalues from Form
     ///////////////////////////////////////////////////
-    function getinputTime($date, $time) {
-    //Todo validate Date and Time
+    function getinputTime($date, $time)
+    {
+        //Todo validate Date and Time
         $dateformatarr = explode(',', $this->bloxconfig['date_format']);
         $datearr = explode($this->bloxconfig['date_divider'], $date);
         $key = array_search('d', $dateformatarr);
@@ -946,10 +1010,11 @@ class blox {
     //////////////////////////////////////////////////
     //Formulardaten speichern
     ///////////////////////////////////////////////////
-    function saveblox() {
+    function saveblox()
+    {
         global $modx;
-        if (file_exists($modx->config['base_path'].$this->bloxconfig['onsavefile'])) {
-            include ($modx->config['base_path'].$this->bloxconfig['onsavefile']);
+        if (file_exists($modx->config['base_path'] . $this->bloxconfig['onsavefile'])) {
+            include ($modx->config['base_path'] . $this->bloxconfig['onsavefile']);
         }
 
         return;
@@ -958,7 +1023,8 @@ class blox {
     ///////////////////////////////////////////////////////////////////
     //function to register css and javascript from snippet parameters
     ////////////////////////////////////////////////////////////////////
-    function regSnippetScriptsAndCSS() {
+    function regSnippetScriptsAndCSS()
+    {
         global $modx;
         if (isset($this->bloxconfig['css']) && $this->bloxconfig['css'] != "") {
             if ($modx->getChunk($this->bloxconfig['css']) != "") {
@@ -985,7 +1051,8 @@ class blox {
     //////////////////////////////////////////////////////////////////////////
     //Member Check
     //////////////////////////////////////////////////////////////////////////
-    function isMemberOf($groups) {
+    function isMemberOf($groups)
+    {
         global $modx;
         if ($groups == 'all') {
             return true;
@@ -1002,32 +1069,34 @@ class blox {
     //function to check for permission
     /////////////////////////////////////////////////////////////////////////////
 
-    function checkpermission($permission) {
-        $groupnames=$this->getwebusergroupnames();
-        $perms='';
-        foreach($groupnames as $groupname) {
-            $perms.=$this->bloxconfig['permissions'][$groupname].',';
+    function checkpermission($permission)
+    {
+        $groupnames = $this->getwebusergroupnames();
+        $perms = '';
+        foreach ($groupnames as $groupname) {
+            $perms .= $this->bloxconfig['permissions'][$groupname] . ',';
         }
-        $perms=explode(',',$perms);
+        $perms = explode(',', $perms);
         return in_array($permission, $perms);
     }
     /////////////////////////////////////////////////////////////////////////////
     //function to get the groupnames of the webuser
     /////////////////////////////////////////////////////////////////////////////
 
-    function getwebusergroupnames() {
+    function getwebusergroupnames()
+    {
         global $modx;
         $userid = $modx->getLoginUserID();
-        $rows = array ();
-        $names = array ();
+        $rows = array();
+        $names = array();
         if (!$userid) {
             return $names;
         } else {
-            $tablename1 = $modx->getFullTableName('web_groups').' wg';
-            $tablename2 = $modx->getFullTableName('webgroup_names').' wn';
+            $tablename1 = $modx->getFullTableName('web_groups') . ' wg';
+            $tablename2 = $modx->getFullTableName('webgroup_names') . ' wn';
             $query = "SELECT distinct name
-                       FROM ".$tablename1.", ".$tablename2." 
-                       where webuser=".$userid." and wn.id = wg.webgroup";
+                       FROM " . $tablename1 . ", " . $tablename2 . " 
+                       where webuser=" . $userid . " and wn.id = wg.webgroup";
             $result = $modx->db->query($query);
             $rows = $modx->db->makeArray($result);
             foreach ($rows as $row) {
@@ -1043,10 +1112,11 @@ class blox {
     /////////////////////////////////////////////////////////////////////////////
     //function to filter the rows
     /////////////////////////////////////////////////////////////////////////////
-    function filterrows($rows) {
+    function filterrows($rows)
+    {
         $filters_arr = $this->bloxconfig['filters_arr'];
-        $filters = array ();
-        $filterbys = array ();
+        $filters = array();
+        $filterbys = array();
         if ($filters_arr > 0) {
             foreach ($filters_arr as $theFilter) {
                 $thefilters = explode('(', $theFilter);
@@ -1056,7 +1126,7 @@ class blox {
                 $filters[$filterBy] = $filterValues;
             }
         }
-        $outputrows = array ();
+        $outputrows = array();
         foreach ($rows as $row) {
             if (count($filterbys) == 0) {
                 $pusharray = 1;
@@ -1064,28 +1134,23 @@ class blox {
                 foreach ($filterbys as $filterBy) {
                     $pusharray = 0;
                     $filterValues = $filters[$filterBy];
-                    if ($filterValues == '')
-                        unset ($filterValues);
-                    if (isset ($filterValues)) {
+                    if ($filterValues == '') unset($filterValues);
+                    if (isset($filterValues)) {
                         $Values = explode("|", $filterValues);
                         foreach ($Values as $filterValue) {
-                            if ($xdbconfig['showempty'] == $filterValue && (trim($row[$filterBy]) == '' || empty ($row[$filterBy]))) {
+                            if ($xdbconfig['showempty'] == $filterValue && (trim($row[$filterBy]) == '' || empty($row[$filterBy]))) {
                                 $pusharray = 1;
-                            }
-                            elseif (trim($row[$filterBy]) !== '' && !empty ($row[$filterBy])) {
+                            } elseif (trim($row[$filterBy]) !== '' && !empty($row[$filterBy])) {
                                 $isValue = strpos(strtolower($filterValue), strtolower($row[$filterBy]));
                                 $isValueAlt = (strtolower($row[$filterBy]) == strtolower($filterValue));
                                 if ($isValueAlt === false) {
-                                } else
-                                    $pusharray = 1;
+                                } else  $pusharray = 1;
                             }
                         }
-                    }
-                    elseif (!empty ($row[$filterBy]) || trim($row[$filterBy]) !== '') {
+                    } elseif (!empty($row[$filterBy]) || trim($row[$filterBy]) !== '') {
                         $pusharray = 0;
                     }
-                    if ($pusharray == 0)
-                        break;
+                    if ($pusharray == 0) break;
                 }
             }
             if ($pusharray == 1) {
@@ -1097,17 +1162,18 @@ class blox {
 
     }
 
-    function filter2sqlwhere($filters, $TVarray=array(), $resourceclass='modDocument',$having='') {
+    function filter2sqlwhere($filters, $TVarray = array(), $resourceclass = 'modDocument', $having = '')
+    {
 
 
-    //$filter = 'pagetitle|der Titel|=++parent|25,30,40|IN++(rennennr|10|>||(published|1|=++deleted|0|=)++id|1,2,3,4,5|IN)||parent|25|=';
-    //$where = '`pagetitle`="der Titel" AND `parent` IN (25,30,40) AND (`rennennr` > 10 OR `published` = 1 AND `deleted` = 0) OR `id` IN (1,2,3,4,5))';
-    //Todo??:
-	//title,body|database|MATCH
-	//SELECT * FROM articles WHERE MATCH (title,body) AGAINST ('database');
-	//use $filter='title|%database%|like||pagetitle|%database%|like';
+        //$filter = 'pagetitle|der Titel|=++parent|25,30,40|IN++(rennennr|10|>||(published|1|=++deleted|0|=)++id|1,2,3,4,5|IN)||parent|25|=';
+        //$where = '`pagetitle`="der Titel" AND `parent` IN (25,30,40) AND (`rennennr` > 10 OR `published` = 1 AND `deleted` = 0) OR `id` IN (1,2,3,4,5))';
+        //Todo??:
+        //title,body|database|MATCH
+        //SELECT * FROM articles WHERE MATCH (title,body) AGAINST ('database');
+        //use $filter='title|%database%|like||pagetitle|%database%|like';
 
-    // das Suchmuster mit Delimiter und Modifer (falls vorhanden)
+        // das Suchmuster mit Delimiter und Modifer (falls vorhanden)
         $pattern = '#(\|\|)|(\+\+)#';
 
         // RegEx mit preg_split() auswerten
@@ -1118,13 +1184,13 @@ class blox {
         // formatierte Ausgabe
         //echo '<pre>'.print_r($filterarray, true).'</pre>';
         //$fieldsarray = explode(',',$fields);
-        $alias=$resourceclass=='modDocument'?'sc.':'';
+        $alias = $resourceclass == 'modDocument' ? 'sc.' : '';
 
         $where = '';
-		$delimiter='|';
+        $delimiter = '|';
 
         foreach ($filterarray as $filter) {
-            if (! empty($filter)) {
+            if (!empty($filter)) {
                 $filter = trim($filter);
                 $o_bracket = '';
                 $c_bracket = '';
@@ -1138,22 +1204,20 @@ class blox {
                     $filter = str_replace(')', '', $filter);
                 }
 
-                switch($filter) {
+                switch ($filter) {
                     case '||':
                         $andOr = ' OR ';
                         break;
                     case '++':
                         $andOr = ' AND ';
                         break;
-                        default:
-                            $pieces = explode($delimiter, $filter);
-                            if (count($pieces) == 3)
-                            {
-                                $o_enc = '"';
-                                $c_enc = '"';
-								$pieces[1] = ($pieces[1] == '#EMPTY#')?'':$pieces[1];
-                                switch($pieces[2])
-                                {
+                    default:
+                        $pieces = explode($delimiter, $filter);
+                        if (count($pieces) == 3) {
+                            $o_enc = '"';
+                            $c_enc = '"';
+                            $pieces[1] = ($pieces[1] == '#EMPTY#') ? '' : $pieces[1];
+                            switch ($pieces[2]) {
                                 case 'IN':
                                     $o_enc = '(';
                                     $c_enc = ')';
@@ -1169,29 +1233,28 @@ class blox {
                                     break;
                                 case 'ne':
                                     $pieces[2] = '<>';
-                                    break;									
-                                /*
-								case 'isempty':
-								case 'not isempty':
+                                    break;
+                                    /*
+                                    case 'isempty':
+                                    case 'not isempty':
                                     $o_enc = '(';
                                     $c_enc = ')';
-									$pieces[1]=$pieces[0];
-									$scipfield=true;								
+                                    $pieces[1]=$pieces[0];
+                                    $scipfield=true;								
                                     break;
-                                */    									
+                                    */
                                 default:
                                     break;
                             }
-	                        $field = $pieces[0];
-                            if ($resourceclass == 'modDocument' && in_array($field, $this->tvnames))
-                            {
+                            $field = $pieces[0];
+                            if ($resourceclass == 'modDocument' && in_array($field, $this->tvnames)) {
                                 $TVarray[$field] = $field;
                                 //$field = $field.'_tvcv.`value`';
-         						//$field = " IF(".$field."_tvcv.value!='',".$field."_tvcv.value,".$field."_tv.default_text) "; 
-                                $alias='';
-    						}
-		                    $field = $scipfield?'':$alias.'`'.$field.'`';
-                            $where .= $andOr.$o_bracket.$field.$pieces[2].$o_enc.$pieces[1].$c_enc.' '.$c_bracket;
+                                //$field = " IF(".$field."_tvcv.value!='',".$field."_tvcv.value,".$field."_tv.default_text) ";
+                                $alias = '';
+                            }
+                            $field = $scipfield ? '' : $alias . '`' . $field . '`';
+                            $where .= $andOr . $o_bracket . $field . $pieces[2] . $o_enc . $pieces[1] . $c_enc . ' ' . $c_bracket;
                         }
                         break;
                 }
@@ -1203,122 +1266,127 @@ class blox {
 
     }
 
-    function getrows(){
-		$result=array();
-		switch ($this->bloxconfig['resourceclass']){
-    		case 'modDocument':
-			$result=$this->getdocs();
-			break;
-			case 'modTable':
-			$result=$this->gettablerows();
-			break;
-			default:
-			break;
-			
-    	}
+    function getrows()
+    {
+        $result = array();
+        switch ($this->bloxconfig['resourceclass']) {
+            case 'modDocument':
+                $result = $this->getdocs();
+                break;
+            case 'modTable':
+                $result = $this->gettablerows();
+                break;
+            default:
+                break;
 
-        $result=$this->checkXCCbuttons($result);
-		$result=$this->checkDocSort($result);
-		//$result=$this->orderResult($result);
-		//$result=$this->filterResult($result);
+        }
 
-		return $result;
+        $result = $this->checkXCCbuttons($result);
+        $result = $this->checkDocSort($result);
+        //$result=$this->orderResult($result);
+        //$result=$this->filterResult($result);
+
+        return $result;
     }
 
-    function orderResult($result){
+    function orderResult($result)
+    {
         //Todo: orderResult
 
-		return $result;   	
+        return $result;
     }
 
-    function filterResult($result){
+    function filterResult($result)
+    {
         //Todo: filterResult
 
-		return $result;   	
-    }	
-
-    function checkDocSort($result){
-        //add button arround this row for blox-creating
-		
-		if (!empty($this->bloxconfig['IDs']) && empty($this->bloxconfig['orderBy'])){
-			$rows=array();
-			foreach($result as $row){
-				$rows[$row['id']]=$row;
-				
-			}
-		$ids=explode(',',$this->bloxconfig['IDs']);
-        $result=array();
-		foreach ($ids as $id){
-		    $result[]=$rows[$id];	
-		}
-		} 
-		
-		return $result;   	
+        return $result;
     }
 
-    function checkXCCbuttons($result){
+    function checkDocSort($result)
+    {
         //add button arround this row for blox-creating
-		if ($this->bloxconfig['c_type'] == 'xcc_container'&& count($result)>0){
-			foreach($result as & $row){
-				$row['makexccbutton']='1';
-			}
-		} 
-		return $result;   	
+
+        if (!empty($this->bloxconfig['IDs']) && empty($this->bloxconfig['orderBy'])) {
+            $rows = array();
+            foreach ($result as $row) {
+                $rows[$row['id']] = $row;
+
+            }
+            $ids = explode(',', $this->bloxconfig['IDs']);
+            $result = array();
+            foreach ($ids as $id) {
+                $result[] = $rows[$id];
+            }
+        }
+
+        return $result;
+    }
+
+    function checkXCCbuttons($result)
+    {
+        //add button arround this row for blox-creating
+        if ($this->bloxconfig['c_type'] == 'xcc_container' && count($result) > 0) {
+            foreach ($result as &$row) {
+                $row['makexccbutton'] = '1';
+            }
+        }
+        return $result;
     }
 
     function gettablerows()
     {
         global $modx;
-    
+
         //$docmatch_array = array ();
-    
+
         $where = $this->bloxconfig['where'];
         $orderBy = $this->bloxconfig['orderBy'];
-		$groupby = $this->bloxconfig['groupBy'] !==''?' GROUP BY '.$this->bloxconfig['groupBy']:'';
+        $groupby = $this->bloxconfig['groupBy'] !== '' ? ' GROUP BY ' . $this->bloxconfig['groupBy'] : '';
         $pageStart = $this->bloxconfig['pageStart'];
         $perPage = $this->bloxconfig['perPage'];
         $numLinks = $this->bloxconfig['numLinks'];
         $fields = $this->bloxconfig['fields'];
         $requiredFields = $this->bloxconfig['requiredFields'];
-		$filter = $this->bloxconfig['prefilter']==''?$this->bloxconfig['filter']:$this->bloxconfig['prefilter'].'++'.$this->bloxconfig['filter'];
-        $start = $pageStart-1;
-        $limit = $start.', '.$perPage;
-        $where = $this->filter2sqlwhere($filter,array(),$this->bloxconfig['resourceclass']);
-		//$where = $where !== ''?' AND '.$where:'';
+        $filter = $this->bloxconfig['prefilter'] == '' ? $this->bloxconfig['filter'] : $this->bloxconfig['prefilter'] . '++' . $this->bloxconfig['filter'];
+        $start = $pageStart - 1;
+        $limit = $start . ', ' . $perPage;
+        $where = $this->filter2sqlwhere($filter, array(), $this->bloxconfig['resourceclass']);
+        //$where = $where !== ''?' AND '.$where:'';
         $table = $modx->getFullTablename($this->bloxconfig['tablename']);
-       
-		
+
+
         /*
 
         foreach ($requiredFields as $field)
         {
-            if ($fields !== '*' && in_array($field, $this->docColumnNames))
-            {
-                $Fields[] = " sc.$field ";
-            }
-            elseif (in_array($field, $this->tvnames))
-            {
-                $in_tvarray[] = $field;
-                //$Fields[] = $field."_tvcv.value AS $field ";
-                $Fields[] = " IF(".$field."_tvcv.value!='',".$field."_tvcv.value,".$field."_tv.default_text) AS $field ";
-                $Froms[] = "$t_tv AS ".$field."_tv ";
-                $tvJoins .= " LEFT JOIN $t_cv AS ".$field."_tvcv ON ".$field."_tvcv.contentid = sc.id AND ".$field."_tvcv.tmplvarid = ".$field."_tv.id";
-                $tvNames .= " AND ".$field."_tv.name = '$field'";
-            }
+        if ($fields !== '*' && in_array($field, $this->docColumnNames))
+        {
+        $Fields[] = " sc.$field ";
+        }
+        elseif (in_array($field, $this->tvnames))
+        {
+        $in_tvarray[] = $field;
+        //$Fields[] = $field."_tvcv.value AS $field ";
+        $Fields[] = " IF(".$field."_tvcv.value!='',".$field."_tvcv.value,".$field."_tv.default_text) AS $field ";
+        $Froms[] = "$t_tv AS ".$field."_tv ";
+        $tvJoins .= " LEFT JOIN $t_cv AS ".$field."_tvcv ON ".$field."_tvcv.contentid = sc.id AND ".$field."_tvcv.tmplvarid = ".$field."_tv.id";
+        $tvNames .= " AND ".$field."_tv.name = '$field'";
+        }
         }
         */
-        $rs = $modx->db->select($this->bloxconfig['distinct'].' '.$fields, $table, $where.$groupby);
+        $rs = $modx->db->select($this->bloxconfig['distinct'] . ' ' . $fields, $table, $where . $groupby);
         $this->totalCount = $modx->db->getRecordCount($rs);
 
-        $rs = $modx->db->select($this->bloxconfig['distinct'].' '.$fields, $table, $where.$groupby, $orderBy, $start.', '.$perPage);
-        //$this->columnNames = $modx->db->getColumnNames( $rs );	// Get column names - in the order you select them     
+        $rs = $modx->db->select($this->bloxconfig['distinct'] . ' ' . $fields, $table, $where . $groupby, $orderBy, $start . ', ' . $perPage);
+        //$this->columnNames = $modx->db->getColumnNames( $rs );	// Get column names - in the order you select them
         $rows = $modx->db->makeArray($rs);
-		
-		$this->columnNames = array_keys($rows[0]);    
-    
+
+        $this->columnNames = array_keys($rows[0]);
+
         return $rows;
-	
-	}   
+
+    }
 
 
     function getdocs()
@@ -1326,120 +1394,116 @@ class blox {
 
 
         global $modx;
-    
+
         //$docmatch_array = array ();
-    
+
         $where = $this->bloxconfig['where'];
         $orderby = $this->bloxconfig['orderBy'];
-		$groupby = $this->bloxconfig['groupBy'] !==''?' GROUP BY '.$this->bloxconfig['groupBy']:'';
+        $groupby = $this->bloxconfig['groupBy'] !== '' ? ' GROUP BY ' . $this->bloxconfig['groupBy'] : '';
         $pageStart = $this->bloxconfig['pageStart'];
         $perPage = $this->bloxconfig['perPage'];
         $numLinks = $this->bloxconfig['numLinks'];
         $fields = $this->bloxconfig['fields'];
         $requiredFields = $this->bloxconfig['requiredFields'];
-        $start = $pageStart-1;
-        $limit = $start.', '.$perPage;
-    
+        $start = $pageStart - 1;
+        $limit = $start . ', ' . $perPage;
+
         $t_sc = $modx->getFullTableName('site_content');
         $t_tv = $modx->getFullTableName('site_tmplvars');
         $t_cv = $modx->getFullTableName('site_tmplvar_contentvalues');
-    
+
         $this->getTvNames();
         $this->getDocColumnNames();
-        $Tvarray = array ();
+        $Tvarray = array();
 
 
         $where = $this->filter2sqlwhere($this->bloxconfig['prefilter'], $Tvarray, 'modDocument');
-        $where = $where !== ''?' AND '.$where:'';
+        $where = $where !== '' ? ' AND ' . $where : '';
 
         $having = $this->filter2sqlwhere($this->bloxconfig['filter'], $Tvarray, 'modDocument');
-		$having = $having == ''?'':' HAVING '.$having.' ';
-		
-    
+        $having = $having == '' ? '' : ' HAVING ' . $having . ' ';
+
+
         //echo $where;
         //
-        $orderby = (! empty($orderby))?$orderby:'sc.menutitle';
+        $orderby = (!empty($orderby)) ? $orderby : 'sc.menutitle';
         //$fields = (! empty($fields))?$fields:'*';
-        $contentFields = array ();
-        $getTVs = array ();
-        $Fields = array ();
-        $Froms = array ();
+        $contentFields = array();
+        $getTVs = array();
+        $Fields = array();
+        $Froms = array();
         $Froms[] = "$t_sc AS sc";
         $tvValues = '';
         $tvFroms = '';
         $tvJoins = '';
         $matchTvJoins = '';
         $tvNames = '';
-        $in_tvarray = array ();
-        $Fields = array ('sc.*');
+        $in_tvarray = array();
+        $Fields = array('sc.*');
 
-        foreach ($requiredFields as $field)
-        {
-            if (in_array($field, $this->tvnames))
-            {
+        foreach ($requiredFields as $field) {
+            if (in_array($field, $this->tvnames)) {
                 $in_tvarray[] = $field;
                 //$Fields[] = $field."_tvcv.value AS $field ";
-                $Fields[] = " IF(".$field."_tvcv.value!='',".$field."_tvcv.value,".$field."_tv.default_text) AS $field ";
-                $Froms[] = "$t_tv AS ".$field."_tv ";
-                $tvJoins .= " LEFT JOIN $t_cv AS ".$field."_tvcv ON ".$field."_tvcv.contentid = sc.id AND ".$field."_tvcv.tmplvarid = ".$field."_tv.id";
-                $tvNames .= " AND ".$field."_tv.name = '$field'";
+                $Fields[] = " IF(" . $field . "_tvcv.value!=''," . $field . "_tvcv.value," . $field . "_tv.default_text) AS $field ";
+                $Froms[] = "$t_tv AS " . $field . "_tv ";
+                $tvJoins .= " LEFT JOIN $t_cv AS " . $field . "_tvcv ON " . $field . "_tvcv.contentid = sc.id AND " . $field . "_tvcv.tmplvarid = " . $field . "_tv.id";
+                $tvNames .= " AND " . $field . "_tv.name = '$field'";
             }
         }
-     
-    
-        foreach ($Tvarray as $field)
-        {
-            if (!in_array($field, $in_tvarray))
-            {
-                $Fields[] = " IF(".$field."_tvcv.value!='',".$field."_tvcv.value,".$field."_tv.default_text) AS $field ";
-				$Froms[] = "$t_tv AS ".$field."_tv ";
-                $tvJoins .= " LEFT JOIN $t_cv AS ".$field."_tvcv ON ".$field."_tvcv.contentid = sc.id AND ".$field."_tvcv.tmplvarid = ".$field."_tv.id";
-                $tvNames .= " AND ".$field."_tv.name = '$field'";
+
+
+        foreach ($Tvarray as $field) {
+            if (!in_array($field, $in_tvarray)) {
+                $Fields[] = " IF(" . $field . "_tvcv.value!=''," . $field . "_tvcv.value," . $field . "_tv.default_text) AS $field ";
+                $Froms[] = "$t_tv AS " . $field . "_tv ";
+                $tvJoins .= " LEFT JOIN $t_cv AS " . $field . "_tvcv ON " . $field . "_tvcv.contentid = sc.id AND " . $field . "_tvcv.tmplvarid = " . $field . "_tv.id";
+                $tvNames .= " AND " . $field . "_tv.name = '$field'";
             }
         }
-    
-        $rows = array ();
-    
-    
-        $orderby = (! empty($orderby))?'ORDER BY '.$orderby:'';
-        $limit = ($limit !== '0')?"LIMIT $limit":'';
+
+        $rows = array();
+
+
+        $orderby = (!empty($orderby)) ? 'ORDER BY ' . $orderby : '';
+        $limit = ($limit !== '0') ? "LIMIT $limit" : '';
         /*
-         $where = '';
-         if (count($docmatch_array) > 0) {
-         foreach ($docmatch_array as $key=>$value) {
-         $whereIN= ($key=='id'||$key=='parent')?'IN ('.$value.')':'= "'.$value.'"';
-         $where .= ' and CAST(sc.`'.$key.'`AS CHAR) '.$whereIN;
-         }
-         }
-         */
-    
+        $where = '';
+        if (count($docmatch_array) > 0) {
+        foreach ($docmatch_array as $key=>$value) {
+        $whereIN= ($key=='id'||$key=='parent')?'IN ('.$value.')':'= "'.$value.'"';
+        $where .= ' and CAST(sc.`'.$key.'`AS CHAR) '.$whereIN;
+        }
+        }
+        */
+
         /*
-         if (count($tvmatch_array) > 0) {
-         foreach ($tvmatch_array as $key=>$value) {
-         $tv='tv'.$key;
-         $where .= ' and '.$tv.'.value = "'.$value.'"';
-         $matchTvJoins .= "
-         LEFT JOIN
-         $t_cv AS ".$tv." ON ".$tv.".contentid = sc.id AND ".$tv.".tmplvarid = ".$key;
-         }
-         }
-         */
+        if (count($tvmatch_array) > 0) {
+        foreach ($tvmatch_array as $key=>$value) {
+        $tv='tv'.$key;
+        $where .= ' and '.$tv.'.value = "'.$value.'"';
+        $matchTvJoins .= "
+        LEFT JOIN
+        $t_cv AS ".$tv." ON ".$tv.".contentid = sc.id AND ".$tv.".tmplvarid = ".$key;
+        }
+        }
+        */
         /*
-         if (count($getTVs)>0){
-         foreach ($getTVs as $tv) {
-         $Fields[] = $tv."_tvcv.value AS $tv ";
-         $Froms[] = "$t_tv AS ".$tv."_tv ";
-         $tvJoins .= "
-         LEFT JOIN
-         $t_cv AS ".$tv."_tvcv ON ".$tv."_tvcv.contentid = sc.id AND ".$tv."_tvcv.tmplvarid = ".$tv."_tv.id";
-         $tvNames .= "
-         AND
-         ".$tv."_tv.name = '$tv'";
-         }
-         }
-         */
-    
-        $Fields = $this->bloxconfig['distinct'].' '.implode(',', $Fields);
+        if (count($getTVs)>0){
+        foreach ($getTVs as $tv) {
+        $Fields[] = $tv."_tvcv.value AS $tv ";
+        $Froms[] = "$t_tv AS ".$tv."_tv ";
+        $tvJoins .= "
+        LEFT JOIN
+        $t_cv AS ".$tv."_tvcv ON ".$tv."_tvcv.contentid = sc.id AND ".$tv."_tvcv.tmplvarid = ".$tv."_tv.id";
+        $tvNames .= "
+        AND
+        ".$tv."_tv.name = '$tv'";
+        }
+        }
+        */
+
+        $Fields = $this->bloxconfig['distinct'] . ' ' . implode(',', $Fields);
         $Froms = implode(',', $Froms);
         // Build query
         $sql = "
@@ -1463,16 +1527,15 @@ class blox {
 
         $sql .= $limit;
         $rs = $modx->db->query($sql);
-	
-		//$this->columnNames = $modx->db->getColumnNames($sql);
-   
+
+        //$this->columnNames = $modx->db->getColumnNames($sql);
+
         $rows = $modx->db->makeArray($rs);
 
         $this->columnNames = array_keys($rows[0]);
         return $rows;
-		
-    }
 
+    }
 
 
     /**
@@ -1507,10 +1570,10 @@ class blox {
      * @return array $data - Sorted data
      */
 
-    function sortDbResult($_data) {
-    	
+    function sortDbResult($_data)
+    {
 
-		
+
         $_argList = func_get_args();
         $_data = array_shift($_argList);
         if (empty($_data)) {
@@ -1521,7 +1584,7 @@ class blox {
         $_cols = array();
         $_rules = array();
         for ($_i = 0; $_i < $_max; $_i += 3) {
-            $_name = (string) $_argList[$_i];
+            $_name = (string )$_argList[$_i];
             if (!in_array($_name, array_keys(current($_data)))) {
                 continue;
             }
@@ -1529,7 +1592,8 @@ class blox {
                 $_order = SORT_ASC;
                 $_mode = SORT_REGULAR;
                 $_i -= 2;
-            } else if (3 > $_argList[($_i + 1)]) {
+            } else
+                if (3 > $_argList[($_i + 1)]) {
                     $_order = SORT_ASC;
                     $_mode = $_argList[($_i + 1)];
                     $_i--;
@@ -1542,10 +1606,11 @@ class blox {
                         $_mode = $_argList[($_i + 2)];
                     }
                 }
-            $_mode = $_mode != SORT_NUMERIC
-                ? $_argList[($_i + 2)] != SORT_STRING ? SORT_REGULAR : SORT_STRING
-                : SORT_NUMERIC;
-            $_rules[] = array('name' => $_name, 'order' => $_order, 'mode' => $_mode);
+                $_mode = $_mode != SORT_NUMERIC ? $_argList[($_i + 2)] != SORT_STRING ? SORT_REGULAR : SORT_STRING : SORT_NUMERIC;
+            $_rules[] = array(
+                'name' => $_name,
+                'order' => $_order,
+                'mode' => $_mode);
         }
         foreach ($_data as $_k => $_row) {
             foreach ($_rules as $_rule) {
@@ -1563,202 +1628,207 @@ class blox {
         return $_data;
     }
 
-/*
- * $link['page'] = 3;
- * $link['aname'] = 'avalue';
- * $link['another'] = 'one';
- * echo smartModxUrl($modx->documentObject["id"],NULL, $link);
- */
+    /*
+    * $link['page'] = 3;
+    * $link['aname'] = 'avalue';
+    * $link['another'] = 'one';
+    * echo smartModxUrl($modx->documentObject["id"],NULL, $link);
+    */
 
-function smartModxUrl($docid, $docalias, $array_values,$removearray=array()) {
-		global $modx;
-		$array_url = $_GET;
-		$urlstring = array();
-		
-		unset($array_url["id"]);
-		unset($array_url["q"]);
-		
-		$array_url = array_merge($array_url,$array_values);
-
-		foreach ($array_url as $name => $value) {
-			if (!is_null($value)&& !in_array($name,$removearray)) {
-			  $urlstring[] = $name . '=' . urlencode($value);
-			}
-		}
-		
-		return $modx->makeUrl($docid, $docalias, join('&',$urlstring));
-	}
-
-	// ---------------------------------------------------
-	// Function: getChildIDs
-	// Get the IDs ready to be processed
-	// Similar to the modx version by the same name but much faster
-	// ---------------------------------------------------
-
-	function getChildParents($IDs, $depth) {
-		global $modx;
-		$depth = intval($depth);
-		$kids = array();
-		$parents = array();
-		$docIDs = array();
-		
-		if ($depth == 0 && $IDs[0] == 0 && count($IDs) == 1) {
-			$parents['0']= 0 ; 
-			
-			foreach ($modx->documentMap as $null => $document) {
-				foreach ($document as $parent => $id) {
-					//$kids[] = $id;
-					$parents[$parent]= $parent ;
-				}
-			}
-			return $parents;
-		} else if ($depth == 0) {
-			$depth = 10000;
-				// Impliment unlimited depth...
-		}
-		
-		foreach ($modx->documentMap as $null => $document) {
-			foreach ($document as $parent => $id) {
-				$kids[$parent][] = $id;
-			}
-		}
-
-		foreach ($IDs AS $seed) {
-			if (!empty($kids[intval($seed)])) {
-				$docIDs = array_merge($docIDs,$kids[intval($seed)]);
-				$parents[intval($seed)]= intval($seed);
-				unset($kids[intval($seed)]);
-			}
-		}
-		$depth--;
-
-		while($depth != 0) {
-			$valid = $docIDs;
-			foreach ($docIDs as $child=>$id) {
-				if (!empty($kids[intval($id)])) {
-					$docIDs = array_merge($docIDs,$kids[intval($id)]);
-					$parents[intval($id)]= intval($id);
-					unset($kids[intval($id)]);
-				}
-			}
-			$depth--;
-			if ($valid == $docIDs) $depth = 0;
-		}
-
-		return $parents;
-	}
-
-
-//////////////////////////////////////////////////////////////////////
-// Ditto - Functions
-// Author: 
-// 		Mark Kaplan for MODx CMF
-//////////////////////////////////////////////////////////////////////
-
-	// ---------------------------------------------------
-	// Function: cleanIDs
-	// Clean the IDs of any dangerous characters
-	// ---------------------------------------------------
-	
-	function cleanIDs($IDs) {
-		//Define the pattern to search for
-		$pattern = array (
-			'`(,)+`', //Multiple commas
-			'`^(,)`', //Comma on first position
-			'`(,)$`' //Comma on last position
-		);
-
-		//Define replacement parameters
-		$replace = array (
-			',',
-			'',
-			''
-		);
-
-		//Clean startID (all chars except commas and numbers are removed)
-		$IDs = preg_replace($pattern, $replace, $IDs);
-
-		return $IDs;
-	}
-	// ---------------------------------------------------
-	// Function: getChildIDs
-	// Get the IDs ready to be processed
-	// Similar to the modx version by the same name but much faster
-	// ---------------------------------------------------
-
-	function getChildIDs($IDs, $depth) {
-		global $modx;
-		$depth = intval($depth);
-		$kids = array();
-		$docIDs = array();
-		
-		if ($depth == 0 && $IDs[0] == 0 && count($IDs) == 1) {
-			foreach ($modx->documentMap as $null => $document) {
-				foreach ($document as $parent => $id) {
-					$kids[] = $id;
-				}
-			}
-			return $kids;
-		} else if ($depth == 0) {
-			$depth = 10000;
-				// Impliment unlimited depth...
-		}
-		
-		foreach ($modx->documentMap as $null => $document) {
-			foreach ($document as $parent => $id) {
-				$kids[$parent][] = $id;
-			}
-		}
-
-		foreach ($IDs AS $seed) {
-			if (!empty($kids[intval($seed)])) {
-				$docIDs = array_merge($docIDs,$kids[intval($seed)]);
-				unset($kids[intval($seed)]);
-			}
-		}
-		$depth--;
-
-		while($depth != 0) {
-			$valid = $docIDs;
-			foreach ($docIDs as $child=>$id) {
-				if (!empty($kids[intval($id)])) {
-					$docIDs = array_merge($docIDs,$kids[intval($id)]);
-					unset($kids[intval($id)]);
-				}
-			}
-			$depth--;
-			if ($valid == $docIDs) $depth = 0;
-		}
-
-		return array_unique($docIDs);
-	}
-
-    function getSiteMap($items,$level=0){
-        /* $start = array (array ('id'=>0));
-         * $map = getSiteMap($start);
-         * print_r($map);
-         */
-        
+    function smartModxUrl($docid, $docalias, $array_values, $removearray = array())
+    {
         global $modx;
-        $pages = array ();
-        foreach ($items as $item)
-        {
-            $page = array ();
-			$page['id']= $item['id'];
-			$page['level'] = $level;
+        $array_url = $_GET;
+        $urlstring = array();
+
+        unset($array_url["id"]);
+        unset($array_url["q"]);
+
+        $array_url = array_merge($array_url, $array_values);
+
+        foreach ($array_url as $name => $value) {
+            if (!is_null($value) && !in_array($name, $removearray)) {
+                $urlstring[] = $name . '=' . urlencode($value);
+            }
+        }
+
+        return $modx->makeUrl($docid, $docalias, join('&', $urlstring));
+    }
+
+    // ---------------------------------------------------
+    // Function: getChildIDs
+    // Get the IDs ready to be processed
+    // Similar to the modx version by the same name but much faster
+    // ---------------------------------------------------
+
+    function getChildParents($IDs, $depth)
+    {
+        global $modx;
+        $depth = intval($depth);
+        $kids = array();
+        $parents = array();
+        $docIDs = array();
+
+        if ($depth == 0 && $IDs[0] == 0 && count($IDs) == 1) {
+            $parents['0'] = 0;
+
+            foreach ($modx->documentMap as $null => $document) {
+                foreach ($document as $parent => $id) {
+                    //$kids[] = $id;
+                    $parents[$parent] = $parent;
+                }
+            }
+            return $parents;
+        } else
+            if ($depth == 0) {
+                $depth = 10000;
+                // Impliment unlimited depth...
+            }
+
+        foreach ($modx->documentMap as $null => $document) {
+            foreach ($document as $parent => $id) {
+                $kids[$parent][] = $id;
+            }
+        }
+
+        foreach ($IDs as $seed) {
+            if (!empty($kids[intval($seed)])) {
+                $docIDs = array_merge($docIDs, $kids[intval($seed)]);
+                $parents[intval($seed)] = intval($seed);
+                unset($kids[intval($seed)]);
+            }
+        }
+        $depth--;
+
+        while ($depth != 0) {
+            $valid = $docIDs;
+            foreach ($docIDs as $child => $id) {
+                if (!empty($kids[intval($id)])) {
+                    $docIDs = array_merge($docIDs, $kids[intval($id)]);
+                    $parents[intval($id)] = intval($id);
+                    unset($kids[intval($id)]);
+                }
+            }
+            $depth--;
+            if ($valid == $docIDs) $depth = 0;
+        }
+
+        return $parents;
+    }
+
+
+    //////////////////////////////////////////////////////////////////////
+    // Ditto - Functions
+    // Author:
+    // 		Mark Kaplan for MODx CMF
+    //////////////////////////////////////////////////////////////////////
+
+    // ---------------------------------------------------
+    // Function: cleanIDs
+    // Clean the IDs of any dangerous characters
+    // ---------------------------------------------------
+
+    function cleanIDs($IDs)
+    {
+        //Define the pattern to search for
+        $pattern = array(
+            '`(,)+`', //Multiple commas
+            '`^(,)`', //Comma on first position
+            '`(,)$`' //Comma on last position
+                );
+
+        //Define replacement parameters
+        $replace = array(
+            ',',
+            '',
+            '');
+
+        //Clean startID (all chars except commas and numbers are removed)
+        $IDs = preg_replace($pattern, $replace, $IDs);
+
+        return $IDs;
+    }
+    // ---------------------------------------------------
+    // Function: getChildIDs
+    // Get the IDs ready to be processed
+    // Similar to the modx version by the same name but much faster
+    // ---------------------------------------------------
+
+    function getChildIDs($IDs, $depth)
+    {
+        global $modx;
+        $depth = intval($depth);
+        $kids = array();
+        $docIDs = array();
+
+        if ($depth == 0 && $IDs[0] == 0 && count($IDs) == 1) {
+            foreach ($modx->documentMap as $null => $document) {
+                foreach ($document as $parent => $id) {
+                    $kids[] = $id;
+                }
+            }
+            return $kids;
+        } else
+            if ($depth == 0) {
+                $depth = 10000;
+                // Impliment unlimited depth...
+            }
+
+        foreach ($modx->documentMap as $null => $document) {
+            foreach ($document as $parent => $id) {
+                $kids[$parent][] = $id;
+            }
+        }
+
+        foreach ($IDs as $seed) {
+            if (!empty($kids[intval($seed)])) {
+                $docIDs = array_merge($docIDs, $kids[intval($seed)]);
+                unset($kids[intval($seed)]);
+            }
+        }
+        $depth--;
+
+        while ($depth != 0) {
+            $valid = $docIDs;
+            foreach ($docIDs as $child => $id) {
+                if (!empty($kids[intval($id)])) {
+                    $docIDs = array_merge($docIDs, $kids[intval($id)]);
+                    unset($kids[intval($id)]);
+                }
+            }
+            $depth--;
+            if ($valid == $docIDs) $depth = 0;
+        }
+
+        return array_unique($docIDs);
+    }
+
+    function getSiteMap($items, $level = 0)
+    {
+        /* $start = array (array ('id'=>0));
+        * $map = getSiteMap($start);
+        * print_r($map);
+        */
+
+        global $modx;
+        $pages = array();
+        foreach ($items as $item) {
+            $page = array();
+            $page['id'] = $item['id'];
+            $page['level'] = $level;
             $page['pagetitle'] = $item['pagetitle'];
             //$page['URL'] = $modx->makeUrl($item['id']);
             $children = $modx->getAllChildren($item['id'], 'menuindex ASC, pagetitle', 'ASC', 'id,isfolder,pagetitle,description,parent,alias,longtitle,published,deleted,hidemenu');
-            if (count($children) > 0)
-            {
-                $children = $this->getSiteMap($children,$level+1);
-                $page['innerrows']['level_'.$level+1] = $children;
+            if (count($children) > 0) {
+                $children = $this->getSiteMap($children, $level + 1);
+                $page['innerrows']['level_' . $level + 1] = $children;
             }
             $pages[] = $page;
         }
-    
+
         return $pages;
     }
-	
+
 }
+
 ?>
